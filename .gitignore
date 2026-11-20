@@ -1,0 +1,57 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+db.sqlite3
+*.sqlite3
+
+# Environment variables: arquivos .env reais nunca vão para o git.
+# Só os modelos com placeholders são versionados.
+.env
+.env.*
+!.env.example
+!**/.env.example
+!deploy/.env.prod.example
+
+# Arquivos gerados pelo backend
+media/
+staticfiles/
+
+# Testes (BE-087/BE-082)
+.coverage
+coverage.xml
+htmlcov/
+e2e-artifacts/
+.pytest_cache/
+.ruff_cache/
+
+# Implantação (Fase 7): segredos, certificados e estado do deploy nunca vão para o git
+deploy/.env.prod
+deploy/certs/
+deploy/secrets/
+deploy/.deploy-state
+deploy/.deploy-state.tmp
+
+# Chaves e certificados soltos (o projeto não versiona nenhum)
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Documentos e anotações locais (entregas acadêmicas, cofre do Obsidian)
+*.docx
+.obsidian/
+
+# Arquivos temporários, logs, backups e configurações locais de editor/SO
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/settings.local.json

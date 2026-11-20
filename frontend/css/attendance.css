@@ -1,0 +1,133 @@
+/* Atendimento: cliente (T13, T14) e oficina (T18, T19, T20) */
+
+/* ---------- progresso compacto ---------- */
+
+.mst { display: inline-flex; gap: 4px; align-items: center; }
+
+.mst i { width: 18px; height: 5px; border-radius: 3px; background: var(--olive); }
+
+.mst i.on { background: var(--red); }
+
+.mst--no { color: var(--red-deep); font-weight: 600; font-size: .72rem; }
+
+/* ---------- cartões do cliente (T13) ---------- */
+
+.att { text-decoration: none; color: inherit; transition: transform .2s var(--ease); }
+
+.att:hover { transform: translateY(-2px); }
+
+.att h2 { font-size: 1rem; font-weight: 600; }
+
+.att__top { display: flex; justify-content: space-between; gap: 8px; align-items: start; flex-wrap: wrap; }
+
+.att__w { background: color-mix(in srgb, var(--amber) 22%, transparent); border: 1.5px solid var(--amber); border-radius: 10px; padding: 6px 10px; font-size: .78rem; font-weight: 600; }
+
+.att__t { font-weight: 700; color: var(--red-deep); }
+
+/* ---------- detalhe (T14, T19) ---------- */
+
+.ad { display: grid; gap: 16px; }
+
+.ad__h { background: var(--surface); border-radius: 20px; padding: 18px 20px; display: grid; gap: 10px; }
+
+.ad__h h1 { font-size: 1.25rem; font-weight: 600; }
+
+.ad .stp { border-radius: 14px; }
+
+.tbl .ind { padding-left: 18px; position: relative; }
+
+.tbl .ind::before { content: "↳"; position: absolute; left: 0; color: var(--muted); }
+
+.btot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 6px 0; font-size: .9rem; }
+
+.btot b { font-size: 1.1rem; }
+
+details.pastb { background: var(--surface); border-radius: 16px; padding: 12px 16px; margin-bottom: 10px; }
+
+details.pastb summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+
+/* ---------- M02: estrelas ---------- */
+
+.rate__s { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+
+.rate__s input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+
+.rate__s label { font-size: 2rem; line-height: 1; cursor: pointer; color: var(--olive); }
+
+.rate__s input:checked ~ label,
+.rate__s label:hover,
+.rate__s label:hover ~ label { color: var(--amber); }
+
+.rate__s input:focus-visible + label { outline: 3px solid var(--red-deep); outline-offset: 2px; border-radius: 6px; }
+
+/* ---------- oficina: contadores e quadro (T18) ---------- */
+
+.cnts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+
+.cnt {
+    background: var(--surface);
+    border: 1.5px solid transparent;
+    border-radius: 16px;
+    padding: 12px 14px;
+    text-align: left;
+    display: grid;
+    gap: 2px;
+}
+
+.cnt b { font-size: 1.5rem; line-height: 1.1; }
+
+.cnt span { font-size: .75rem; color: var(--muted); }
+
+.cnt[aria-pressed=true] { border-color: var(--red-deep); background: color-mix(in srgb, var(--red-deep) 10%, var(--surface)); }
+
+.board { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+
+.col { background: var(--sand); border-radius: 16px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 120px; }
+
+.col h2 { font-size: .8rem; font-weight: 600; padding: 2px 4px; display: flex; justify-content: space-between; }
+
+.kc { background: var(--surface); border-radius: 12px; padding: 10px 12px; display: grid; gap: 3px; text-decoration: none; color: inherit; font-size: .8rem; }
+
+.kc:hover { outline: 2px solid var(--olive); }
+
+.kc b { font-size: .86rem; }
+
+.kc--0 { text-align: center; color: var(--muted); background: none; }
+
+/* ---------- oficina: ações e execução (T19) ---------- */
+
+.exe { display: inline-flex; border: 1.5px solid var(--olive); border-radius: 999px; overflow: hidden; }
+
+.exe button { border: 0; background: var(--cream); padding: 4px 12px; font-size: .72rem; }
+
+.exe button[aria-pressed=true] { background: var(--red-deep); color: #fff; }
+
+.pend { font-size: .8rem; color: var(--muted); }
+
+/* ---------- editor de orçamento (T20) ---------- */
+
+.bed .tbl input,
+.bed .tbl select {
+    width: 100%;
+    min-width: 0;
+    border: 1.5px solid var(--olive);
+    background: var(--cream);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 6px 8px;
+    font-size: .8rem;
+}
+
+.bed .tbl input[aria-invalid=true],
+.bed .tbl select[aria-invalid=true] { border-color: var(--red-deep); }
+
+.bed .tbl td { vertical-align: top; }
+
+.rst { font-size: .7rem; color: var(--muted); display: block; min-height: 1em; }
+
+.rst--err { color: var(--red-deep); }
+
+@media (max-width: 640px) {
+    .bed .tbl td input,
+    .bed .tbl td select { max-width: 60%; }
+}

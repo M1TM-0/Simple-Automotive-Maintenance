@@ -1,0 +1,18 @@
+
+# Importa todas as dependências da aplicação
+-r base.txt
+
+# Testes
+pytest==9.2.0
+pytest-django==4.14.0
+factory-boy==3.3.0
+pytest-cov==4.1.0
+
+# Qualidade e lint
+ruff==0.17.3
+
+# Auditoria de segurança das dependências
+pip-audit==2.9.0
+
+# Testes de navegador
+playwright==1.65.2  # BE-094: Chromium e Firefox; o Firefox do 1.41 (NSS antigo) não lê CA local no perfil

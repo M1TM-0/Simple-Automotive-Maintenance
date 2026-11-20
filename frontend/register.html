@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>SAM — CRIAR CONTA</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        >
+
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/components.css">
+        <link rel="stylesheet" href="css/auth.css">
+    </head>
+
+    <body>
+        <header class="hdr" id="hdr"></header>
+
+        <main class="view auth" id="view">
+            <section class="acard" aria-labelledby="t">
+                <img class="authlogo" src="assets/img/logo-sam.png" alt="SAM — Simple Auto Maintenance">
+
+                <h1 id="t">Criar conta</h1>
+
+                <p class="sub">Leva menos de um minuto.</p>
+
+                <form id="f" novalidate>
+                    <fieldset class="roles">
+                        <legend class="sr">Tipo de conta</legend>
+
+                        <label>
+                            <input type="radio" name="role" value="client" checked>
+                            Sou cliente
+                        </label>
+
+                        <label>
+                            <input type="radio" name="role" value="workshop">
+                            Sou oficina
+                        </label>
+                    </fieldset>
+
+                    <div id="cf-c">
+                    <div class="fld">
+                        <label for="name">Nome completo <abbr title="obrigatório">*</abbr></label>
+                        <input id="name" name="name" autocomplete="name">
+                        <span class="err" id="e-name" role="alert"></span>
+                    </div>
+                    </div>
+
+                    <div id="cf-w" hidden>
+                    <div class="fld">
+                        <label for="name_fantasy">Nome fantasia da oficina <abbr title="obrigatório">*</abbr></label>
+                        <input id="name_fantasy" name="name_fantasy" autocomplete="organization" maxlength="255">
+                        <span class="err" id="e-name_fantasy" role="alert"></span>
+                    </div>
+                    <div class="fld">
+                        <label for="name_responsible">Nome do responsável <abbr title="obrigatório">*</abbr></label>
+                        <input id="name_responsible" name="name_responsible" autocomplete="name" maxlength="255">
+                        <span class="err" id="e-name_responsible" role="alert"></span>
+                    </div>
+                    <div class="fld">
+                        <label for="cnpj">CNPJ <abbr title="obrigatório">*</abbr></label>
+                        <input
+                            id="cnpj"
+                            name="cnpj"
+                            inputmode="text"
+                            autocapitalize="characters"
+                            spellcheck="false"
+                            maxlength="18"
+                            placeholder="00.AAA.000/0000-00"
+                        >
+                        <span class="err" id="e-cnpj" role="alert"></span>
+                    </div>
+                    </div>
+
+                    <div class="fld">
+                        <label for="email">E-mail <abbr title="obrigatório">*</abbr></label>
+                        <input id="email" name="email" type="email" autocomplete="email">
+                        <span class="err" id="e-email" role="alert"></span>
+                    </div>
+                    <div class="fld">
+                        <label for="phone_number">Telefone (opcional)</label>
+                        <input id="phone_number" name="phone_number" type="tel" autocomplete="tel" maxlength="255">
+                        <span class="err" id="e-phone_number" role="alert"></span>
+                    </div>
+                    <div class="fld">
+                        <label for="pw">Senha (mín. 8, com letras e números)</label>
+
+                        <div class="pw">
+                            <input id="pw" type="password" autocomplete="new-password">
+
+                            <button type="button" class="tg" data-for="pw" aria-pressed="false" aria-controls="pw">
+                                Mostrar
+                            </button>
+                        </div>
+
+                        <span class="err" id="e-pw" role="alert"></span>
+                    </div>
+                    <div class="fld">
+                        <label for="pw2">Confirmar senha</label>
+
+                        <div class="pw">
+                            <input id="pw2" type="password" autocomplete="new-password">
+
+                            <button type="button" class="tg" data-for="pw2" aria-pressed="false" aria-controls="pw2">
+                                Mostrar
+                            </button>
+                        </div>
+
+                        <span class="err" id="e-pw2" role="alert"></span>
+                    </div>
+
+                    <p class="ferr" id="ferr" role="alert"></p>
+
+                    <button class="btn btn--solid" id="sb">Criar conta</button>
+                </form>
+
+                <p class="alt">Já tem conta? <a href="login.html">Entrar</a></p>
+
+                <p class="note2" id="note" hidden>
+                    Modo local: ainda não há servidor de autenticação.
+                    Contas e dados ficam apenas neste navegador.
+                </p>
+            </section>
+        </main>
+
+        <div id="toasts" aria-live="polite"></div>
+
+        <script src="js/ui.js"></script>
+        <script src="js/config.js"></script>
+        <script src="js/enums.js"></script>
+        <script src="js/auth.js"></script>
+        <script src="js/data.js"></script>
+        <script src="js/api.js"></script>
+        <script src="js/components.js"></script>
+        <script src="js/components-parts.js"></script>
+        <script src="js/register.js"></script>
+    </body>
+</html>

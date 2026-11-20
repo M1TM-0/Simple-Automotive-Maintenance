@@ -1,0 +1,120 @@
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:16
+    container_name: sam-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sam}
+      POSTGRES_USER: ${POSTGRES_USER:-sam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  # API Django
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+
+    container_name: sam-api
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-sam}:${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}@db:5432/${POSTGRES_DB:-sam}
+
+    # createcachetable: tabela do cache compartilhado (limites de taxa, BE-033) quando
+    # CACHE_BACKEND=DatabaseCache; com o LocMemCache padrão de dev não faz nada.
+    command: sh -c "python manage.py migrate --noinput && python manage.py createcachetable && python manage.py runserver 0.0.0.0:8000"
+
+    volumes:
+      - ./backend:/app
+      - ./database:/database:ro
+      - media_data:/app/media
+
+    ports:
+      - "8000:8000"
+
+    # P-17: a API só conta como no ar quando responde (o jobs espera por isso).
+    healthcheck:
+      test: ["CMD", "python", "/app/docker/healthcheck.py"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Rotinas periódicas: expirações, divulgações pagas e lembretes de manutenção
+  jobs:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+
+    container_name: sam-jobs
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-sam}:${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}@db:5432/${POSTGRES_DB:-sam}
+
+    # Expirações a cada 60 s; lembretes de manutenção preventiva (BE-077) a cada 1 h.
+    command: python manage.py run_expiration_jobs --loop --interval 60 --reminders-interval 3600 --heartbeat-file /tmp/sam-jobs.alive
+
+    volumes:
+      - ./backend:/app
+      - ./database:/database:ro
+
+    # Batimento da rotina (BE-092): sem execução bem-sucedida em 5 min → unhealthy.
+    healthcheck:
+      test: ["CMD", "python", "/app/docker/healthcheck.py", "--file", "/tmp/sam-jobs.alive", "--max-age", "300"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Servidor estático do frontend
+  web:
+    image: python:3.12-slim
+    container_name: sam-web
+    restart: unless-stopped
+
+    working_dir: /app
+
+    command: python -m http.server 5500 --bind 0.0.0.0
+
+    volumes:
+      - ./frontend:/app:ro
+
+    ports:
+      - "5500:5500"
+
+volumes:
+  pgdata:
+  media_data:

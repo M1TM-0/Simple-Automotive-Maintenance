@@ -1,0 +1,164 @@
+# SAM — proxy reverso de produção (BE-089). Incluído dentro de http {} pelo nginx.conf
+# da imagem oficial; o entrypoint troca ${SAM_SERVER_NAME} (envsubst, só variáveis SAM_*).
+#
+#   https://${SAM_SERVER_NAME}/          frontend estático (frontend/, config.js de produção)
+#   https://${SAM_SERVER_NAME}/api/      API Django (Gunicorn no serviço `api`)
+#   https://${SAM_SERVER_NAME}/admin/    Django Admin (moderação, DP-03)
+#   https://${SAM_SERVER_NAME}/static/   estáticos do Django (collectstatic, na imagem)
+#   https://${SAM_SERVER_NAME}/media/    imagens enviadas (volume `media`, só leitura)
+#
+# Mesma origem (DP-21): sem CORS; cookies de sessão e CSRF valem sem exceções.
+
+server_tokens off;
+
+# ------------------------------------------------------------------ logs
+# JSON, um por linha. Vai para o stdout (docker logs) e para um arquivo por dia em
+# /var/log/sam (volume `nginx_logs`), que o monitor lê para a taxa de 5xx e a latência
+# (BE-092) e apaga depois de SAM_ACCESS_LOG_RETENTION_DAYS. A query string NÃO é
+# registrada ($uri): o token da redefinição de senha não vai para o log.
+map $time_iso8601 $sam_log_day {
+    "~^(?<day>\d{4}-\d{2}-\d{2})" $day;
+    default "undated";
+}
+
+log_format sam_json escape=json
+    '{"time":"$time_iso8601","remote_addr":"$remote_addr","method":"$request_method",'
+    '"uri":"$uri","status":$status,"request_time":$request_time,'
+    '"upstream_time":"$upstream_response_time","bytes":$body_bytes_sent,'
+    '"request_id":"$request_id","user_agent":"$http_user_agent"}';
+
+access_log /var/log/nginx/access.log sam_json;
+access_log /var/log/sam/access-$sam_log_day.jsonl sam_json;
+open_log_file_cache max=4 inactive=60s valid=60s min_uses=1;
+
+# ------------------------------------------------------------------ geral
+# Uploads: o Django recusa acima de SAM_MAX_UPLOAD_BYTES (16 MB) com 413 em JSON. O
+# Nginx aceita um pouco mais para que essa resposta (lida pelo frontend) chegue; acima
+# disto ele mesmo responde 413 (também em JSON, ver @too_large).
+client_max_body_size 17m;
+client_body_buffer_size 128k;
+
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_proxied any;
+gzip_types text/css application/javascript application/json image/svg+xml text/plain;
+
+upstream sam_api {
+    server api:8000;
+    keepalive 16;
+    # Menor que o keepalive do Gunicorn (5 s): o Nginx fecha a conexão ociosa primeiro.
+    keepalive_timeout 4s;
+}
+
+# ------------------------------------------------------------------ HTTP → HTTPS
+server {
+    listen 80 default_server;
+    server_name _;
+
+    # Renovação do certificado (Let's Encrypt, desafio HTTP-01 por webroot).
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # HEALTHCHECK do contêiner (só dentro da rede; não registra).
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location / {
+        return 301 https://${SAM_SERVER_NAME}$request_uri;
+    }
+}
+
+# ------------------------------------------------------------------ HTTPS
+# SNI desconhecido (IP direto, outro domínio) não recebe o certificado nem o site.
+server {
+    listen 443 ssl default_server;
+    server_name _;
+    ssl_reject_handshake on;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${SAM_SERVER_NAME} ${SAM_SERVER_ALIAS};
+
+    # Certificado conforme DP-22 (Let's Encrypt ou da instituição): fullchain + chave.
+    ssl_certificate /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    # Mozilla "intermediate" (TLS 1.2 e 1.3, só ECDHE).
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SAM_TLS:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    root /usr/share/nginx/sam/frontend;
+    index index.html;
+
+    # 413 em JSON nas rotas da API (o api.js lê `detail`).
+    error_page 413 @too_large;
+    location @too_large {
+        default_type application/json;
+        return 413 '{"detail":"A requisição excede o tamanho máximo permitido."}';
+    }
+
+    # ---------------------------------------------------- API e Django Admin
+    location /api/ {
+        include /etc/nginx/snippets/proxy.conf;
+        # A API só fala JSON: nada nela pode carregar scripts ou ser embutido.
+        add_header Content-Security-Policy "default-src 'none'; frame-ancestors 'none'" always;
+    }
+
+    # Swagger UI (só is_staff em produção) carrega JS/CSS de CDN; sem a CSP acima.
+    location /api/docs/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
+    location /admin/ {
+        include /etc/nginx/snippets/proxy.conf;
+    }
+
+    # ---------------------------------------------------- estáticos do Django
+    location /static/ {
+        alias /usr/share/nginx/sam/static/;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "public, max-age=86400" always;
+    }
+
+    # ---------------------------------------------------- mídia enviada
+    # Só as extensões que o backend grava (imagens reprocessadas: jpg, png, webp; nomes
+    # UUID — um arquivo nunca muda de conteúdo). Qualquer outra coisa: 404.
+    location ~* ^/media/(.+\.(?:jpe?g|png|webp))$ {
+        alias /var/www/media/$1;
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Content-Security-Policy "default-src 'none'; sandbox" always;
+        add_header Cache-Control "private, max-age=2592000, immutable" always;
+    }
+
+    location /media/ {
+        return 404;
+    }
+
+    # ---------------------------------------------------- frontend
+    # Nomes de arquivo sem hash: HTML/JS/CSS são revalidados a cada carga (ETag), para
+    # que uma nova versão chegue sem limpar cache.
+    location / {
+        try_files $uri $uri/ =404;
+        include /etc/nginx/snippets/security-headers.conf;
+        include /etc/nginx/snippets/csp-frontend.conf;
+        add_header Cache-Control "no-cache" always;
+    }
+
+    location /assets/ {
+        include /etc/nginx/snippets/security-headers.conf;
+        include /etc/nginx/snippets/csp-frontend.conf;
+        add_header Cache-Control "public, max-age=86400" always;
+    }
+
+    error_page 404 /404.html;
+}

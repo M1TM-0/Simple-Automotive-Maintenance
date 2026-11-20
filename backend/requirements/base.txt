@@ -1,0 +1,32 @@
+
+# Python suportado: 3.12
+
+# Framework principal
+Django==5.2.18
+
+# API REST
+djangorestframework==3.18.3
+
+# Driver PostgreSQL com suporte a binário e pool de conexões
+psycopg[binary,pool]==3.3.7
+
+# Documentação da API (OpenAPI/Swagger)
+drf-spectacular==0.30.0
+
+# Filtros para pesquisas na API
+django-filter==26.2
+
+# Upload e processamento de imagens
+Pillow==13.0.0
+
+# Requisições entre origens diferentes (CORS)
+django-cors-headers==4.9.0
+
+# Servidor de aplicação para produção
+gunicorn==26.2.0
+
+# Configuração de variáveis de ambiente
+django-environ==0.14.0
+
+# Segurança e autenticação (Argon2)
+argon2-cffi==25.1.0

@@ -1,0 +1,20 @@
+# Ambiente virtual
+venv/
+.venv/
+
+# Arquivos de ambiente
+.env
+.env.*
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Testes e cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/

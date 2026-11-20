@@ -1,0 +1,215 @@
+# SAM — produção (BE-091, seção 13 do backlog). NÃO suba à mão: use deploy/deploy.sh,
+# que segue a ordem backup → migrate → conferência do schema → nova versão → /ready/
+# e volta para a versão anterior se a nova não ficar pronta.
+#
+#   db       PostgreSQL 16, volume pgdata, sem porta publicada
+#   api      Django + Gunicorn (usuário 10001), só na rede interna
+#   jobs     run_expiration_jobs a cada 60 s + lembretes a cada 1 h (BE-023/BE-077)
+#   proxy    Nginx: TLS, frontend, /api, /media, mesma origem (BE-089) — portas 80/443
+#   backup   backup diário cifrado + cópia fora do servidor (BE-090)
+#   monitor  verificações e alertas (BE-092)
+#
+# Variáveis: deploy/.env.prod (modelo: .env.prod.example). SAM_VERSION vem do deploy.sh.
+
+name: ${SAM_PROJECT:-sam}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "5"
+
+x-app-env: &app-env
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+  DATABASE_URL: postgres://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:?}
+  ALLOWED_HOSTS: ${SAM_SERVER_NAME:?defina SAM_SERVER_NAME}
+  # Mesma origem (DP-21): sem CORS; o CSRF confere a origem https do próprio domínio.
+  CSRF_TRUSTED_ORIGINS: https://${SAM_SERVER_NAME}
+  CORS_ALLOWED_ORIGINS: ""
+  FRONTEND_BASE_URL: https://${SAM_SERVER_NAME}
+  # Atrás do Nginx (BE-089): HTTPS pelo X-Forwarded-Proto e IP real pelo X-Forwarded-For.
+  USE_X_FORWARDED_PROTO: "True"
+  SAM_NUM_PROXIES: "1"
+  MEDIA_ROOT: /app/media
+  SAM_ENVIRONMENT: ${SAM_ENVIRONMENT:-produção}
+
+x-app: &app
+  image: sam-api:${SAM_VERSION:?SAM_VERSION vem do deploy.sh}
+  restart: unless-stopped
+  env_file: ${SAM_ENV_FILE:-.env.prod}
+  environment: *app-env
+  depends_on:
+    db:
+      condition: service_healthy
+  logging: *logging
+
+services:
+  db:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # Observabilidade (BE-092): espera de lock e deadlock no log; consultas lentas sem os
+    # valores dos parâmetros (podem conter dados pessoais).
+    command:
+      - postgres
+      - -c
+      - max_connections=100
+      - -c
+      - log_lock_waits=on
+      - -c
+      - deadlock_timeout=1s
+      - -c
+      - log_min_duration_statement=1000
+      - -c
+      - log_parameter_max_length=0
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    stop_grace_period: 60s
+    logging: *logging
+
+  api:
+    <<: *app
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+      target: api
+    volumes:
+      - media:/app/media
+    expose:
+      - "8000"
+    # > graceful_timeout do Gunicorn (30 s): as requisições em andamento terminam.
+    stop_grace_period: 45s
+
+  jobs:
+    <<: *app
+    command:
+      - python
+      - manage.py
+      - run_expiration_jobs
+      - --loop
+      - --interval
+      - "60"
+      - --reminders-interval
+      - "3600"
+      - --heartbeat-file
+      - /tmp/sam-jobs.alive
+    environment:
+      <<: *app-env
+      DB_POOL_MIN: "1"
+      DB_POOL_MAX: "2"
+    healthcheck:
+      test: ["CMD", "python", "/app/docker/healthcheck.py", "--file", "/tmp/sam-jobs.alive", "--max-age", "300"]
+      interval: 60s
+      timeout: 5s
+      start_period: 120s
+      start_interval: 5s
+      retries: 3
+    stop_grace_period: 30s
+
+  monitor:
+    <<: *app
+    command: ["python", "manage.py", "monitor", "--loop", "--interval", "30"]
+    environment:
+      <<: *app-env
+      DB_POOL_MIN: "1"
+      DB_POOL_MAX: "2"
+      SAM_MONITOR_READY_URL: http://api:8000/api/health/ready/
+      SAM_MONITOR_ACCESS_LOG_DIR: /var/log/sam
+      SAM_MONITOR_DISK_PATHS: /app/media,/backups,/var/log/sam
+    volumes:
+      - nginx_logs:/var/log/sam
+      # nocopy: quem só lê a mídia não copia para o volume o dono do diretório da
+      # própria imagem (com o volume vazio isso tirava a escrita da API, BE-094).
+      - type: volume
+        source: media
+        target: /app/media
+        read_only: true
+        volume:
+          nocopy: true
+      - backups:/backups:ro
+    healthcheck:
+      disable: true
+    stop_grace_period: 15s
+
+  proxy:
+    image: sam-proxy:${SAM_VERSION}
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+      target: proxy
+    restart: unless-stopped
+    environment:
+      SAM_SERVER_NAME: ${SAM_SERVER_NAME}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - type: volume
+        source: media
+        target: /var/www/media
+        read_only: true
+        volume:
+          nocopy: true
+      - nginx_logs:/var/log/sam
+      - ${SAM_TLS_DIR:-./certs}:/etc/nginx/certs:ro
+      - certbot_www:/var/www/certbot:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    stop_grace_period: 40s
+    logging: *logging
+
+  backup:
+    image: sam-backup:${SAM_VERSION}
+    build:
+      context: ./backup
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      TZ: ${SAM_TIME_ZONE:-America/Sao_Paulo}
+      SAM_ENVIRONMENT: ${SAM_ENVIRONMENT:-produção}
+      SAM_ALERT_WEBHOOK_URL: ${SAM_ALERT_WEBHOOK_URL:-}
+      BACKUP_HOUR: ${BACKUP_HOUR:-03}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      BACKUP_KEEP_MIN: ${BACKUP_KEEP_MIN:-3}
+      BACKUP_GPG_RECIPIENT_FILE: ${BACKUP_GPG_RECIPIENT_FILE:-}
+      BACKUP_PASSPHRASE_FILE: ${BACKUP_PASSPHRASE_FILE:-}
+      BACKUP_RCLONE_REMOTE: ${BACKUP_RCLONE_REMOTE:-}
+      BACKUP_REMOTE_KEEP_DAYS: ${BACKUP_REMOTE_KEEP_DAYS:-30}
+      RCLONE_CONFIG: /run/secrets/backup/rclone.conf
+      MEDIA_OWNER: "10001:10001"
+    volumes:
+      - backups:/backups
+      - type: volume
+        source: media
+        target: /media
+        read_only: true
+        volume:
+          nocopy: true
+      - ${SAM_BACKUP_SECRETS_DIR:-./secrets/backup}:/run/secrets/backup:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    # Um backup em andamento termina antes de o contêiner parar.
+    stop_grace_period: 15m
+    logging: *logging
+
+volumes:
+  pgdata:
+  media:
+  backups:
+  nginx_logs:
+  certbot_www:

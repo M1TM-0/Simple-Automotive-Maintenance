@@ -1,0 +1,84 @@
+[tool.ruff]
+# Configurações gerais
+line-length = 88
+indent-width = 4
+src = ["apps", "config"]
+extend-exclude = ["**/migrations/0001_*.py"]
+
+# Versão mínima do Python do projeto.
+# Ajuste conforme a versão utilizada.
+target-version = "py312"
+
+[tool.ruff.lint]
+# Regras de análise estática
+select = [
+    "E",    # Erros de estilo
+    "F",    # Pyflakes: erros e problemas no código
+    "I",    # Organização de imports
+    "B",    # Flake8-bugbear: possíveis bugs
+    "UP",   # Pyupgrade: modernização do Python
+    "S608", # SQL montado por concatenação (BE-086; ver tests/security/test_sql_safety.py)
+]
+
+# E501 fica a cargo do formatador.
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"config/settings/*.py" = ["F403", "F405"]
+
+[tool.ruff.format]
+# Padrão de formatação
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+# Configuração do Django
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+
+# Diretórios onde os testes serão encontrados
+testpaths = ["apps", "tests"]
+
+# Padrões de nomes dos arquivos de teste
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+# Opções de execução
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "-m", "not e2e and not staging",  # E2E: `pytest -m e2e` (Chromium e Firefox do Playwright); staging: `-m staging`
+]
+
+# Permite importar os pacotes do backend
+pythonpath = ["."]
+
+# Marcadores personalizados
+markers = [
+    "unit: testes unitários",
+    "integration: testes de integração",
+    "db_rules: testes das regras do banco (triggers e funções)",
+    "slow: testes lentos",
+    "e2e: ponta a ponta no navegador (Playwright); rode com -m e2e",
+    "deploy: artefatos de implantação (Gunicorn, Nginx, backup, deploy.sh; BE-088…BE-092)",
+    "staging: validação no staging local no ar (https://sam.localhost; BE-094); rode com -m staging",
+]
+
+# ==========================================
+# COBERTURA (BE-087): `pytest --cov` no CI
+# ==========================================
+[tool.coverage.run]
+source = ["apps", "config"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "config/asgi.py",
+    "config/wsgi.py",
+    "config/settings/dev.py",
+]
+
+[tool.coverage.report]
+# Meta geral; serviços, permissões e seletores têm meta própria de 95% no CI.
+fail_under = 90
+skip_covered = true
+show_missing = true

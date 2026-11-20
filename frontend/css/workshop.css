@@ -1,0 +1,185 @@
+/* Área da oficina: assistente (T17), perfil (T21), serviços (T22), produtos (T23) e telas seguintes */
+
+.stp--w { border-radius: 16px; margin-bottom: 18px; }
+
+/* ---------- horários ---------- */
+
+.hrs { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 14px; }
+
+.hrs__d {
+    border: 1.5px solid var(--olive);
+    border-radius: 14px;
+    padding: 10px 12px 12px;
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.hrs__d legend { font-weight: 600; font-size: .85rem; padding: 0 6px; }
+
+.hrs__r { display: flex; gap: 8px; align-items: center; }
+
+.hrs__r input {
+    flex: 1;
+    min-width: 0;
+    border: 1.5px solid var(--olive);
+    background: var(--cream);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 7px 8px;
+}
+
+.hrs__r input[aria-invalid=true] { border-color: var(--red-deep); }
+
+.hrs__c { font-size: .8rem; }
+
+.hrs__d .btn { padding: .35rem 1rem; font-size: .7rem; justify-self: start; }
+
+/* ---------- ponto no mapa ---------- */
+
+.pt { display: grid; gap: 12px; }
+
+.pt__s { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.pt__s .search { flex: 1; min-width: 200px; background: var(--cream); }
+
+.pt__l { display: grid; gap: 8px; }
+
+.pt__l li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: .82rem;
+}
+
+.pt__l small { display: block; }
+
+.pt__c { background: var(--sand); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+
+.pt__n { background: var(--sand); border-radius: 14px; padding: 12px 14px; }
+
+.pt__n[hidden] { display: none; }
+
+/* ---------- catálogo de serviços ---------- */
+
+.cat { border: 0; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+
+.cat legend { font-weight: 600; font-size: .85rem; margin-bottom: 6px; }
+
+.cat__r { background: var(--cream); border-radius: 12px; padding: 8px 12px; display: grid; gap: 8px; font-size: .84rem; }
+
+.cat__f { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+
+.cat__f label { display: grid; gap: 3px; font-size: .72rem; }
+
+.cat__f input {
+    width: 130px;
+    border: 1.5px solid var(--olive);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 7px 10px;
+}
+
+.cat__f .err { flex-basis: 100%; }
+
+/* ---------- pré-visualização da página pública (T21) ---------- */
+
+.pv { background: var(--surface); border-radius: 20px; overflow: hidden; margin-top: 14px; }
+
+.pv__c { height: 110px; background: var(--sand); }
+
+.pv__c img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.pv__b { display: flex; gap: 14px; padding: 14px 18px 18px; align-items: center; }
+
+.pv__a {
+    width: 64px;
+    height: 64px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--cream);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    margin-top: -40px;
+    border: 3px solid var(--surface);
+}
+
+.pv__a img { width: 100%; height: 100%; object-fit: cover; }
+
+.pv__a svg { width: 70%; }
+
+/* ---------- tabelas de gestão ---------- */
+
+.filt { margin-bottom: 14px; align-items: end; }
+
+.filt .fld { min-width: 190px; }
+
+.pth { width: 56px; height: 44px; object-fit: cover; border-radius: 8px; display: block; }
+
+.note1 { background: var(--sand); border-radius: 12px; padding: 10px 14px; font-size: .8rem; margin-bottom: 14px; }
+
+.chk1 { display: flex; gap: 8px; align-items: center; font-size: .84rem; }
+
+.chk1 input { width: auto; }
+
+/* interruptor (espelho de vehicles.css) */
+
+.sw { display: flex; gap: 10px; align-items: center; font-size: .82rem; }
+
+.sw button {
+    width: 44px;
+    height: 26px;
+    border-radius: 99px;
+    border: 0;
+    background: var(--olive);
+    position: relative;
+    transition: background .25s;
+}
+
+.sw button::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .25s var(--ease);
+}
+
+.sw button[aria-checked=true] { background: var(--red); }
+
+.sw button[aria-checked=true]::after { transform: translateX(18px); }
+
+.sw button:disabled { opacity: .6; }
+
+/* ---------- avaliações (T25) e clientes (T26) ---------- */
+
+.rsum { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+
+.rsum__n { font-size: 2.6rem; font-weight: 700; line-height: 1; }
+
+.bars { display: grid; gap: 4px; font-size: .78rem; }
+
+.bars li { display: grid; grid-template-columns: 2.4rem 1fr 2rem; gap: 8px; align-items: center; }
+
+.bars .bar2 { height: 8px; }
+
+.rvw .acts .btn { padding: .35rem 1rem; font-size: .72rem; }
+
+.cv { border-top: 1px solid var(--sand); padding: 10px 0; display: grid; gap: 6px; }
+
+.cv h3 { font-size: .9rem; font-weight: 600; }
+
+.cv .btn { justify-self: start; padding: .35rem 1rem; font-size: .72rem; }
+
+@media (max-width: 640px) {
+    .rsum { grid-template-columns: 1fr; }
+}

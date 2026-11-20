@@ -1,0 +1,591 @@
+/*
+ * COMPONENTES COMPARTILHADOS (C01 cabeçalho, C02 estados, modal, stepper,
+ * tabela responsiva, abas, selos). Só tokens de base.css; sem !important.
+ * Regras marcadas "espelho" repetem as de uma página (chat/map/shop/vehicles)
+ * para as telas novas não dependerem do CSS de outra página; são idênticas.
+ */
+
+[hidden] { display: none; }
+
+html.modal-open { overflow: hidden; }
+
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+
+.ferr { color: var(--red-deep); font-size: .82rem; min-height: 1.2em; }
+
+.fld small { font-size: .72rem; }
+
+.fld textarea { resize: vertical; font-family: inherit; }
+
+/* ---------- barra de título e grades de cartões ---------- */
+
+.hbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.hbar .h1 { margin: 0; }
+
+.cg {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.cd {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 16px 18px;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    min-width: 0;
+}
+
+.more { text-align: center; margin: 18px 0; }
+
+/* ---------- cabeçalho: menu do usuário e sino ---------- */
+
+.pop-w { position: relative; }
+
+.acct__u { cursor: pointer; }
+
+.bell {
+    position: relative;
+    border: 0;
+    background: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+}
+
+.bell:hover { color: var(--red-deep); }
+
+.bell__n {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: var(--red-deep);
+    color: #fff;
+    font-size: .62rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+}
+
+.bell__n[hidden] { display: none; }
+
+.menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 25;
+    min-width: 210px;
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, .45);
+    animation: in .25s var(--ease);
+}
+
+.menu[hidden] { display: none; }
+
+.menu--bell { width: min(340px, 86vw); max-height: 70vh; overflow: auto; }
+
+.menu li { list-style: none; }
+
+.menu a,
+.menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: none;
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: .82rem;
+    text-decoration: none;
+}
+
+.menu a:hover,
+.menu button:hover { background: var(--cream); }
+
+.menu__h { font-size: .9rem; font-weight: 600; padding: 6px 12px; }
+
+.menu__s { padding: 8px 12px; font-size: .8rem; }
+
+.menu__a { color: var(--red-deep); font-weight: 600; text-align: center; }
+
+.nl { display: grid; gap: 8px; }
+
+.nl li {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: grid;
+    gap: 2px;
+    border-left: 4px solid transparent;
+    font-size: .84rem;
+}
+
+.nl li.is-new { border-left-color: var(--red); }
+
+.nl--s li { background: var(--cream); padding: 8px 12px; }
+
+/* ---------- carregando (espelho de map.css) ---------- */
+
+.sk {
+    height: 96px;
+    border-radius: 18px;
+    background: linear-gradient(100deg, var(--sand) 30%, var(--cream) 50%, var(--sand) 70%);
+    background-size: 300% 100%;
+    animation: skm 1.2s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes skm { to { background-position: -300% 0; } }
+
+/* ---------- chips e abas (espelho de map.css / shop.css) ---------- */
+
+.chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 14px 0 18px;
+}
+
+.chip {
+    border: 1.5px solid var(--olive);
+    background: var(--cream);
+    border-radius: 16px;
+    padding: 7px 18px;
+    font-size: .78rem;
+    font-weight: 500;
+    transition: background .25s, color .25s, transform .15s;
+}
+
+.chip:active { transform: scale(.94); }
+
+.chip[aria-pressed=true] {
+    background: var(--red-deep);
+    border-color: var(--red-deep);
+    color: #fff;
+}
+
+.tabs {
+    position: relative;
+    display: flex;
+    gap: 26px;
+    margin: 18px 0 14px;
+    overflow-x: auto;
+}
+
+.tabs button {
+    border: 0;
+    background: none;
+    padding: 6px 2px;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.tabs button[aria-selected=true] { color: var(--ink); font-weight: 600; }
+
+.tabs i {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: var(--w, 0);
+    background: var(--red);
+    transform: translateX(var(--x, 0));
+    transition: transform .35s var(--ease), width .35s var(--ease);
+}
+
+/* ---------- stepper C04 (espelho de chat.css) ---------- */
+
+.stp {
+    display: flex;
+    padding: 10px 16px;
+    background: var(--cream);
+    overflow-x: auto;
+    font-size: .68rem;
+    position: relative;
+    z-index: 2;
+}
+
+.stp li {
+    flex: 1;
+    min-width: 84px;
+    text-align: center;
+    color: var(--muted);
+    position: relative;
+    padding-top: 16px;
+}
+
+.stp li::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: var(--olive);
+    z-index: 1;
+}
+
+.stp li::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: -50%;
+    width: 100%;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .8s var(--ease);
+}
+
+.stp li:first-child::after { display: none; }
+
+.stp .done::before,
+.stp .cur::before { background: var(--red); }
+
+.stp .done::after,
+.stp .cur::after { transform: scaleX(1); }
+
+.stp .cur { color: var(--ink); font-weight: 600; }
+
+.stp--no { color: var(--red-deep); font-weight: 600; font-size: .78rem; display: block; }
+
+.stp__sub { display: block; font-weight: 400; color: var(--muted); }
+
+/* ---------- selo de status (texto sempre presente) ---------- */
+
+.sb {
+    display: inline-block;
+    border: 1.5px solid var(--olive);
+    border-radius: 999px;
+    padding: 1px 10px;
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.sb--ok { border-color: var(--online); background: color-mix(in srgb, var(--online) 22%, transparent); }
+
+.sb--warn { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 22%, transparent); }
+
+.sb--bad { border-color: var(--red-deep); background: color-mix(in srgb, var(--red-deep) 16%, transparent); }
+
+.sb--done { background: var(--sand); }
+
+/* ---------- tabela responsiva ---------- */
+
+.tbl-w { position: relative; overflow-x: auto; background: var(--surface); border-radius: 16px; }
+
+.tbl { width: 100%; border-collapse: collapse; font-size: .82rem; }
+
+.tbl th,
+.tbl td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--sand);
+    vertical-align: middle;
+}
+
+.tbl thead th {
+    font-size: .68rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    white-space: nowrap;
+}
+
+.tbl tbody th { font-weight: 600; }
+
+.tbl .num { text-align: right; white-space: nowrap; }
+
+.tbl tr:last-child td,
+.tbl tr:last-child th { border-bottom: 0; }
+
+@media (max-width: 640px) {
+    .tbl-w { background: none; overflow: visible; }
+
+    .tbl thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .tbl,
+    .tbl tbody,
+    .tbl tr,
+    .tbl td,
+    .tbl th { display: block; }
+
+    .tbl tr {
+        background: var(--surface);
+        border-radius: 16px;
+        padding: 8px 14px;
+        margin-bottom: 10px;
+    }
+
+    .tbl td,
+    .tbl th {
+        border: 0;
+        padding: 4px 0;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        text-align: right;
+    }
+
+    .tbl td::before,
+    .tbl th::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: .7rem;
+        text-align: left;
+        flex: none;
+    }
+}
+
+/* ---------- subnavegação da oficina ---------- */
+
+.subnav {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 18px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.subnav a {
+    border: 1.5px solid var(--olive);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: .78rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.subnav a[aria-current=page] {
+    background: var(--red-deep);
+    border-color: var(--red-deep);
+    color: #fff;
+}
+
+/* ---------- confirmação inline e seções (espelho de vehicles.css) ---------- */
+
+.acts { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn--danger { border-color: var(--red-deep); color: var(--red-deep); }
+
+.cf {
+    background: var(--sand);
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+    font-size: .85rem;
+}
+
+.sc {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+}
+
+.sc h2 { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+
+/* ---------- modal ---------- */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, .5);
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    animation: fade .2s var(--ease);
+}
+
+@keyframes fade { from { opacity: 0; } }
+
+.modal__box {
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 20px;
+    width: min(480px, 100%);
+    max-height: calc(100dvh - 32px);
+    overflow: auto;
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .6);
+    animation: in .3s var(--ease);
+}
+
+.modal__box--w { width: min(760px, 100%); }
+
+.modal__h {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px 6px;
+}
+
+.modal__h h2 { font-size: 1.1rem; font-weight: 600; }
+
+.modal__b { padding: 8px 20px 20px; display: grid; gap: 14px; }
+
+.modal__b form { display: grid; gap: 12px; }
+
+.modal__b .btn { justify-content: center; }
+
+@media (max-width: 640px) {
+    .modal { align-items: end; padding: 0; }
+
+    .modal__box { border-radius: 20px 20px 0 0; width: 100%; }
+}
+
+/* ---------- seletor de foto (form.photo) ---------- */
+
+.ph1 { gap: 8px; }
+
+.ph1__l { font-weight: 500; }
+
+.ph1__r { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+
+.ph1__pv {
+    width: 96px;
+    height: 76px;
+    border-radius: 14px;
+    background: var(--cream);
+    border: 1.5px dashed var(--olive);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    font-size: .72rem;
+}
+
+.ph1__pv img { width: 100%; height: 100%; object-fit: cover; }
+
+.ph1 input:focus-visible + label { outline: 3px solid var(--red-deep); outline-offset: 3px; }
+
+.ph1 label.btn { cursor: pointer; }
+
+@media (max-width: 640px) {
+    .view > .empty--big { margin: 24px 16px; }
+}
+
+/* ---------- cartão de promoção, link no toast, fieldset em modal ---------- */
+
+.toast__a { color: var(--cream); font-weight: 600; text-decoration: underline; }
+
+.fs--m { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; }
+
+.fs--m legend { font-weight: 500; font-size: .85rem; margin-bottom: 4px; }
+
+.pm { background: var(--surface); border-radius: 18px; overflow: hidden; display: grid; align-content: start; }
+
+.pm__i { display: block; aspect-ratio: 2; background: var(--sand); }
+
+.pm__i img,
+.pm__i svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.pm__b { padding: 12px 14px 4px; display: grid; gap: 2px; font-size: .85rem; }
+
+.pm__d { color: var(--red-deep); font-weight: 700; }
+
+.pm .acts { padding: 8px 14px 14px; }
+
+.pm .btn { padding: .4rem 1rem; font-size: .72rem; }
+
+/* ---------- favoritos (T15) ---------- */
+
+.fav__p { aspect-ratio: 2.2; border-radius: 14px; overflow: hidden; background: var(--cream); }
+
+.fav__p img,
+.fav__p svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.fav h2 { font-size: 1rem; font-weight: 600; }
+
+.fav .btn { padding: .4rem 1rem; font-size: .72rem; }
+
+/* ---------- inputs de arquivo escondidos (.sr) não podem alargar a página ---------- */
+
+input[type=file].sr {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    margin: -1px;
+}
+
+/* ---------- stepper em telas estreitas: cabe sem rolagem ---------- */
+
+@media (max-width: 640px) {
+    .stp li { min-width: 0; }
+}
+
+/* ---------- contraste: vermelho para TEXTO sobre fundos escuros ----------
+ * --red-deep (#B01E26) passa em fundo claro, mas fica ~2,4:1 sobre o modo escuro.
+ * --red-ink usa o mesmo vermelho no claro e uma versão mais clara no escuro.
+ * Só texto/ícone: fundos e bordas de marca continuam com --red e --red-deep. */
+
+:root { --red-ink: var(--red-deep); }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --red-ink: #ff7a70; }
+}
+
+:root[data-theme="dark"] { --red-ink: #ff7a70; }
+
+.btn.btn--danger,
+.acct .acct__b,
+.ferr,
+.fld .err,
+.err,
+.att .att__t,
+.pm .pm__d,
+.stp.stp--no,
+.mst.mst--no,
+.parts .part em,
+.menu .menu__a,
+.cf .err { color: var(--red-ink); }
+
+.sb.sb--bad { border-color: var(--red-ink); }
+
+/* ---------- decisão de design pendente: contraste do botão principal ----------
+ * Branco sobre --red (#FF3B2F) = 3,54:1 (AA pede 4,5:1 em texto pequeno).
+ * Para corrigir sem tocar na marca em outros lugares, troque o valor abaixo por
+ * um vermelho um pouco mais escuro (ex.: #D9291F ≈ 4,6:1). Hoje mantém a marca. */
+
+:root { --red-btn: var(--red); }
+
+.btn.btn--solid {
+    background: var(--red-btn);
+    border-color: var(--red-btn);
+}

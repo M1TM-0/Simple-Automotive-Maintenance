@@ -1,0 +1,202 @@
+name: Backend Tests
+
+# BE-087: lint, testes com PostgreSQL real (regras do banco, segurança, contrato,
+# concorrência, desempenho), cobertura mínima, schema OpenAPI, `check --deploy`,
+# auditoria de dependências, varredura de segredos e E2E no navegador.
+# Fase 7: ensaio de backup/restauração (tests/deploy, ferramentas do PostgreSQL 16) e
+# implantação real com Docker (deploy/smoke-test.sh, job deploy-smoke).
+# Qualquer etapa vermelha reprova o PR, inclusive o formatador (bloqueante desde a P-23).
+
+on:
+  push:
+    paths:
+      - "backend/**"
+      - "database/**"
+      - "frontend/**"
+      - "deploy/**"
+      - ".dockerignore"
+      - ".gitleaks.toml"
+      - ".github/workflows/backend-tests.yml"
+
+  pull_request:
+    paths:
+      - "backend/**"
+      - "database/**"
+      - "frontend/**"
+      - "deploy/**"
+      - ".dockerignore"
+      - ".gitleaks.toml"
+      - ".github/workflows/backend-tests.yml"
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: python -m pip install "ruff==0.17.3"
+      - name: Lint (inclui S608 — SQL montado por concatenação)
+        run: ruff check .
+      - name: Format (bloqueante; formatação geral feita na P-23)
+        run: ruff format --check .
+
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sam
+          POSTGRES_PASSWORD: sam
+          POSTGRES_DB: sam
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sam -d sam"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://sam:sam@localhost:5432/sam
+      SAM_CONCURRENCY_ROUNDS: "10"
+      # Ensaio de backup/restauração (BE-090) nunca é pulado no CI.
+      SAM_REQUIRE_DEPLOY_TOOLS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4  # contrato: normalizadores reais do frontend/js/api.js
+        with:
+          node-version: "20"
+      - name: "PostgreSQL 16 client (mesma versão do serviço: pg_dump/pg_restore, BE-090)"
+        working-directory: .
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q postgresql-common gnupg jq
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -q postgresql-client-16
+          echo "/usr/lib/postgresql/16/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies
+        run: python -m pip install -r requirements/dev.txt
+
+      - name: Check migrations
+        run: |
+          python manage.py makemigrations --check --dry-run
+          python manage.py check --database default
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+
+      - name: OpenAPI schema
+        run: python manage.py spectacular --validate --fail-on-warn --file "$RUNNER_TEMP/schema.yml"
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+
+      - name: Production settings (check --deploy)
+        run: |
+          SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
+            python manage.py check --deploy --fail-level WARNING
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.prod
+          DEBUG: "False"
+          ALLOWED_HOSTS: sam.exemplo.com.br
+
+      - name: Tests + coverage (meta geral 90%)
+        run: pytest --cov --cov-report=term --cov-report=xml
+
+      - name: Coverage of services, permissions and selectors (meta 95%)
+        run: >-
+          coverage report --fail-under=95
+          --include="apps/*/services.py,apps/*/permissions.py,apps/*/selectors.py,apps/*/domain.py,apps/core/mixins.py"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: backend/coverage.xml
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # gitleaks varre o histórico
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dependency audit (falha com vulnerabilidade conhecida)
+        run: |
+          python -m pip install "pip-audit==2.9.0"
+          pip-audit -r requirements/base.txt -r requirements/dev.txt
+      - name: Secret scan (P-16)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Versão fixa (>= 8.25, exigida pela sintaxe `[[allowlists]]`) e configuração
+          # explícita: regras padrão + exceção estreita para senhas fictícias de teste.
+          GITLEAKS_VERSION: "8.30.1"
+          GITLEAKS_CONFIG: ${{ github.workspace }}/.gitleaks.toml
+
+  e2e:
+    # Runner fixo: no ubuntu-latest o `playwright install --with-deps` falhou com
+    # "Package 'libasound2' has no installation candidate" (o pacote foi renomeado para
+    # libasound2t64). O Playwright 1.65 conhece os nomes dos pacotes do Ubuntu 24.04.
+    runs-on: ubuntu-24.04
+    needs: tests
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sam
+          POSTGRES_PASSWORD: sam
+          POSTGRES_DB: sam
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sam -d sam"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://sam:sam@localhost:5432/sam
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies and Chromium
+        run: |
+          python -m pip install -r requirements/dev.txt
+          python -m playwright install --with-deps chromium firefox
+      - name: E2E F1–F8 (frontend real → API → banco)
+        run: pytest -m e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-screenshots
+          path: backend/e2e-artifacts/
+
+  # BE-088…BE-092: imagens de produção construídas e implantação de verdade (TLS
+  # autoassinado): HTTPS, CSP, mesma origem, usuário sem root, parada controlada,
+  # backup + restauração em banco limpo, migration que falha sem derrubar a versão no ar,
+  # volta de versão e alerta do monitor com o banco fora do ar.
+  deploy-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker
+        working-directory: .
+        run: docker version && docker compose version
+      - name: Ensaio de implantação (deploy/smoke-test.sh)
+        working-directory: .
+        run: deploy/smoke-test.sh

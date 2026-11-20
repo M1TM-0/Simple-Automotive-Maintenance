@@ -1,0 +1,20 @@
+# SAM — staging LOCAL (BE-094). Só sobreposições ao compose.prod.yml; o resto (imagens,
+# Nginx com TLS, Gunicorn, rotinas, backup diário, monitor) é idêntico à produção.
+# Não use direto: deploy/staging/staging.sh (projeto `sam-staging`, segredos fora do repo).
+
+services:
+  api:
+    environment:
+      ALLOWED_HOSTS: "${SAM_SERVER_NAME},${SAM_SERVER_ALIAS}"
+      CSRF_TRUSTED_ORIGINS: "https://${SAM_SERVER_NAME},https://${SAM_SERVER_ALIAS}"
+
+  proxy:
+    environment:
+      SAM_SERVER_ALIAS: "${SAM_SERVER_ALIAS:-}"
+    # Só no loopback (IPv4 e IPv6): o staging não fica acessível por nenhuma outra
+    # interface da máquina — nem pela rede local, nem pela internet.
+    ports: !override
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
+      - "[::1]:80:80"
+      - "[::1]:443:443"

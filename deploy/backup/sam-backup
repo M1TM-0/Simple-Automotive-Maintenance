@@ -1,0 +1,218 @@
+#!/usr/bin/env bash
+# Backup do SAM: banco + mídia num único arquivo cifrado (BE-090).
+#
+#   sam-backup            faz um backup agora (o serviço `backup` chama todo dia)
+#
+# Resultado em $BACKUP_DIR: sam-AAAAMMDDTHHMMSSZ.tar.gpg (+ .sha256) contendo
+#   manifest.json   linhas e md5 do conteúdo por tabela, migrations, hashes (conferidos na restauração)
+#   db.dump         pg_dump -Fc
+#   media.tar       arquivos enviados (imagens; o banco só guarda o caminho)
+#   media.sha256    hash de cada imagem
+#
+# O dump e as contagens usam o MESMO snapshot (pg_export_snapshot): na restauração as
+# contagens precisam bater exatamente. A mídia é copiada logo depois do dump; um envio
+# ou troca de foto nesse intervalo pode deixar uma imagem a mais ou a menos (documentado
+# no runbook).
+#
+# Cifragem (uma das duas, obrigatória):
+#   BACKUP_GPG_RECIPIENT_FILE  chave PÚBLICA (recomendado: o servidor não consegue ler os
+#                              backups antigos; a chave privada fica fora dele)
+#   BACKUP_PASSPHRASE_FILE     frase secreta (AES-256)
+#   BACKUP_ALLOW_UNENCRYPTED=1 só para teste local
+#
+# Retenção: BACKUP_KEEP_DAYS (14) dias locais, mantendo pelo menos BACKUP_KEEP_MIN (3).
+# Cópia fora do servidor: BACKUP_RCLONE_REMOTE (ex.: "offsite:sam-backups", config em
+# RCLONE_CONFIG) com retenção BACKUP_REMOTE_KEEP_DAYS (30).
+# Falha: batimento com erro no banco + alerta (SAM_ALERT_WEBHOOK_URL) + saída 1.
+set -Eeuo pipefail
+
+HERE=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+# shellcheck source=lib.sh
+. "$HERE/lib.sh"
+
+# Qualquer falha — inclusive configuração errada ou banco fora do ar — gera alerta
+# (critério de BE-090) e marca o batimento com o erro.
+die() {
+    heartbeat_failure "$1"
+    alert "Backup falhou: $1"
+    exit "${2:-1}"
+}
+
+: "${BACKUP_KEEP_DAYS:=14}"
+: "${BACKUP_KEEP_MIN:=3}"
+: "${BACKUP_REMOTE_KEEP_DAYS:=30}"
+
+require_commands psql pg_dump pg_restore tar gpg jq sha256sum
+[[ -d "$BACKUP_DIR" && -w "$BACKUP_DIR" ]] || die "BACKUP_DIR ($BACKUP_DIR) não existe ou não é gravável."
+[[ -d "$MEDIA_DIR" ]] || die "MEDIA_DIR ($MEDIA_DIR) não existe."
+
+if [[ -n "${BACKUP_GPG_RECIPIENT_FILE:-}" ]]; then
+    [[ -r "$BACKUP_GPG_RECIPIENT_FILE" ]] || die "Chave pública ilegível: $BACKUP_GPG_RECIPIENT_FILE"
+    MODE=public-key
+elif [[ -n "${BACKUP_PASSPHRASE_FILE:-}" ]]; then
+    [[ -s "$BACKUP_PASSPHRASE_FILE" ]] || die "Frase secreta vazia ou ilegível: $BACKUP_PASSPHRASE_FILE"
+    MODE=passphrase
+elif [[ "${BACKUP_ALLOW_UNENCRYPTED:-0}" == "1" ]]; then
+    MODE=none
+else
+    die "Defina BACKUP_GPG_RECIPIENT_FILE ou BACKUP_PASSPHRASE_FILE (backup sem cifra é recusado)."
+fi
+
+# Sobras de um backup interrompido (contêiner morto no meio) com mais de 1 dia.
+find "$BACKUP_DIR" -maxdepth 1 -type d -name '.tmp-sam-*' -mtime +0 -exec rm -rf {} + 2>/dev/null || true
+
+STAMP=$(date -u +%Y%m%dT%H%M%SZ)
+NAME="sam-$STAMP"
+WORK=$(mktemp -d "$BACKUP_DIR/.tmp-$NAME.XXXXXX")
+ERRLOG="$WORK/stderr.log"
+PSQL_PID=""
+STARTED=$(date +%s)
+
+cleanup() {
+    [[ -n "$PSQL_PID" ]] && kill "$PSQL_PID" 2>/dev/null || true
+    [[ -n "${GNUPGHOME:-}" && "$GNUPGHOME" == /tmp/* ]] && rm -rf "$GNUPGHOME"
+    rm -rf "$WORK"
+}
+
+on_error() {
+    local status=$? line=$1 command=$2 detail=""
+    # Em subshell só sai: quem trata (alerta, batimento) é o processo principal.
+    [[ "$BASHPID" == "$$" ]] || exit "$status"
+    trap - ERR
+    [[ -s "$ERRLOG" ]] && detail=$(tail -n 3 "$ERRLOG" | tr '\n' ' ')
+    local message="Backup falhou (linha $line: $command) ${detail}"
+    heartbeat_failure "$message"
+    alert "$message"
+    cleanup
+    exit "$status"
+}
+trap 'on_error $LINENO "$BASH_COMMAND"' ERR
+trap cleanup EXIT
+
+log INFO "Backup iniciado ($MODE): $NAME"
+check_server_version
+
+# ------------------------------------------------------------ snapshot + contagens
+# Uma sessão psql aberta segura o snapshot exportado até o pg_dump terminar.
+# (Os resultados voltam por variável, sem subshell: os descritores do coproc não
+# existem dentro de $(...).) Erros do psql vão para $ERRLOG e encerram a sessão.
+coproc PSQL { psql -X -q -A -t -v ON_ERROR_STOP=1 2>>"$ERRLOG"; }
+
+psql_send() { printf '%s\n' "$1" >&"${PSQL[1]}"; }
+psql_result() {  # psql_result VARIÁVEL
+    local line out=""
+    psql_send '\echo __SAM_END__'
+    while IFS= read -r -t 600 line <&"${PSQL[0]}"; do
+        if [[ "$line" == "__SAM_END__" ]]; then
+            printf -v "$1" '%s' "$out"
+            return 0
+        fi
+        out+="$line"
+    done
+    echo "a sessão psql terminou sem resposta" >>"$ERRLOG"
+    return 1
+}
+
+psql_send "$CHECKSUM_SETTINGS"
+psql_send "BEGIN ISOLATION LEVEL REPEATABLE READ, READ ONLY;"
+psql_send "SELECT pg_export_snapshot();"
+psql_result SNAPSHOT
+[[ -n "$SNAPSHOT" ]]
+
+# Linhas por tabela do schema public, no mesmo snapshot do dump.
+psql_send "SELECT COALESCE(json_object_agg(c.relname, (xpath('/row/n/text()', query_to_xml(format('SELECT count(*) AS n FROM public.%I', c.relname), false, true, '')))[1]::text::bigint ORDER BY c.relname), '{}') FROM pg_class c WHERE c.relnamespace = 'public'::regnamespace AND c.relkind IN ('r', 'p');"
+psql_result TABLES
+psql_send "SELECT COALESCE(json_object_agg(app, name ORDER BY app), '{}') FROM (SELECT app, max(name) AS name FROM django_migrations GROUP BY app) m;"
+psql_result MIGRATIONS
+psql_send "SELECT current_setting('server_version');"
+psql_result SERVER_VERSION
+# Conteúdo por tabela no mesmo snapshot (conferido linha a linha na restauração).
+psql_send "$CHECKSUM_QUERY"
+psql_result CHECKSUMS
+
+pg_dump --format=custom --snapshot="$SNAPSHOT" --file="$WORK/db.dump" 2>>"$ERRLOG"
+psql_send "COMMIT;"
+psql_send '\q'
+wait "$PSQL_PID" || true
+PSQL_PID=""
+
+pg_restore --list "$WORK/db.dump" >/dev/null 2>>"$ERRLOG"  # o arquivo é um dump válido
+
+# ------------------------------------------------------------ mídia
+(cd "$MEDIA_DIR" && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) >"$WORK/media.sha256"
+tar -C "$MEDIA_DIR" -cf "$WORK/media.tar" . 2>>"$ERRLOG"
+MEDIA_FILES=$(wc -l <"$WORK/media.sha256")
+MEDIA_BYTES=$( (cd "$MEDIA_DIR" && find . -type f -printf '%s\n') | awk '{s += $1} END {print s + 0}')
+
+jq -n \
+    --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg database "${PGDATABASE:-}" \
+    --arg server_version "$SERVER_VERSION" \
+    --arg pg_dump "$(pg_dump --version)" \
+    --arg dump_sha256 "$(sha256_of "$WORK/db.dump")" \
+    --arg media_list_sha256 "$(sha256_of "$WORK/media.sha256")" \
+    --argjson tables "$TABLES" \
+    --argjson checksums "$CHECKSUMS" \
+    --argjson migrations "$MIGRATIONS" \
+    --argjson media_files "$MEDIA_FILES" \
+    --argjson media_bytes "$MEDIA_BYTES" \
+    '{format: 1, created_at: $created_at, database: $database, server_version: $server_version,
+      pg_dump: $pg_dump, tables: $tables, checksums: $checksums, migrations: $migrations,
+      db_dump_sha256: $dump_sha256,
+      media: {files: $media_files, bytes: $media_bytes, list_sha256: $media_list_sha256}}' \
+    >"$WORK/manifest.json"
+
+# ------------------------------------------------------------ pacote cifrado
+PARTS=(manifest.json db.dump media.tar media.sha256)
+case "$MODE" in
+public-key)
+    gpg_home
+    OUT="$NAME.tar.gpg"
+    tar -C "$WORK" -cf - "${PARTS[@]}" |
+        gpg --batch --yes --quiet --compress-algo none --trust-model always \
+            --recipient-file "$BACKUP_GPG_RECIPIENT_FILE" --encrypt --output "$WORK/$OUT" 2>>"$ERRLOG"
+    ;;
+passphrase)
+    gpg_home
+    OUT="$NAME.tar.gpg"
+    tar -C "$WORK" -cf - "${PARTS[@]}" |
+        gpg --batch --yes --quiet --compress-algo none --pinentry-mode loopback \
+            --passphrase-file "$BACKUP_PASSPHRASE_FILE" --symmetric --cipher-algo AES256 \
+            --output "$WORK/$OUT" 2>>"$ERRLOG"
+    ;;
+none)
+    OUT="$NAME.tar"
+    tar -C "$WORK" -cf "$WORK/$OUT" "${PARTS[@]}"
+    ;;
+esac
+
+(cd "$WORK" && sha256sum "$OUT" >"$OUT.sha256")
+mv "$WORK/$OUT.sha256" "$WORK/$OUT" "$BACKUP_DIR/"
+SIZE=$(stat -c %s "$BACKUP_DIR/$OUT")
+log INFO "Backup gravado: $BACKUP_DIR/$OUT ($SIZE bytes, $MEDIA_FILES imagens)"
+
+# ------------------------------------------------------------ cópia fora do servidor
+if [[ -n "${BACKUP_RCLONE_REMOTE:-}" ]]; then
+    require_commands rclone
+    rclone copy --checksum --include "$OUT" --include "$OUT.sha256" "$BACKUP_DIR" "$BACKUP_RCLONE_REMOTE/" 2>>"$ERRLOG"
+    rclone check --one-way --include "$OUT" "$BACKUP_DIR" "$BACKUP_RCLONE_REMOTE/" 2>>"$ERRLOG"
+    rclone delete --min-age "${BACKUP_REMOTE_KEEP_DAYS}d" --include 'sam-*.tar*' "$BACKUP_RCLONE_REMOTE/" 2>>"$ERRLOG"
+    log INFO "Cópia fora do servidor: $BACKUP_RCLONE_REMOTE/$OUT"
+fi
+
+# ------------------------------------------------------------ retenção local
+mapfile -t ALL < <(find "$BACKUP_DIR" -maxdepth 1 -type f \( -name 'sam-*.tar.gpg' -o -name 'sam-*.tar' \) -printf '%f\n' | sort -r)
+for ((i = BACKUP_KEEP_MIN; i < ${#ALL[@]}; i++)); do
+    file="$BACKUP_DIR/${ALL[$i]}"
+    if [[ -n $(find "$file" -mtime +"$((BACKUP_KEEP_DAYS - 1))" -print) ]]; then
+        rm -f "$file" "$file.sha256"
+        log INFO "Removido pela retenção: ${ALL[$i]}"
+    fi
+done
+
+ELAPSED=$(($(date +%s) - STARTED))
+heartbeat_success "$(jq -cn --arg file "$OUT" --argjson size "$SIZE" --argjson media "$MEDIA_FILES" \
+    --argjson seconds "$ELAPSED" --arg remote "${BACKUP_RCLONE_REMOTE:-}" \
+    '{file: $file, bytes: $size, media_files: $media, seconds: $seconds, offsite: ($remote != "")}')"
+log INFO "Backup concluído em ${ELAPSED}s: $OUT"
+echo "$BACKUP_DIR/$OUT"

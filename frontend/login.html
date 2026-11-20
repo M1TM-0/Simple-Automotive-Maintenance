@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>SAM — ENTRAR</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        >
+
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/components.css">
+        <link rel="stylesheet" href="css/auth.css">
+    </head>
+
+    <body>
+        <header class="hdr" id="hdr"></header>
+
+        <main class="view auth" id="view">
+            <section class="acard" aria-labelledby="t">
+                <img class="authlogo" src="assets/img/logo-sam.png" alt="SAM — Simple Auto Maintenance">
+
+                <h1 id="t">Entrar na sua conta</h1>
+
+                <p class="sub">Acesse seus veículos, atendimentos e conversas.</p>
+
+                <form id="f" novalidate>
+                    <fieldset class="roles">
+                        <legend class="sr">Tipo de conta</legend>
+
+                        <label>
+                            <input type="radio" name="role" value="client" checked>
+                            Cliente
+                        </label>
+
+                        <label>
+                            <input type="radio" name="role" value="workshop">
+                            Oficina
+                        </label>
+                    </fieldset>
+
+                    <div class="fld">
+                        <label for="email">E-mail</label>
+                        <input id="email" name="email" type="email" autocomplete="email">
+                        <span class="err" id="e-email" role="alert"></span>
+                    </div>
+
+                    <div class="fld">
+                        <label for="pw">Senha</label>
+
+                        <div class="pw">
+                            <input id="pw" type="password" autocomplete="current-password">
+
+                            <button type="button" class="tg" data-for="pw" aria-pressed="false" aria-controls="pw">
+                                Mostrar
+                            </button>
+                        </div>
+
+                        <span class="err" id="e-pw" role="alert"></span>
+                    </div>
+
+                    <p class="ferr" id="ferr" role="alert"></p>
+
+                    <button class="btn btn--solid" id="sb">Entrar</button>
+                </form>
+
+                <p class="alt"><a href="forgot-password.html">Esqueci minha senha</a></p>
+
+                <p class="alt">
+                    Ainda não tem conta?
+                    <a href="register.html">Criar conta</a>
+                </p>
+
+                <div class="demo" id="demo" hidden>
+                    <b>Credenciais demonstrativas (modo local)</b>
+
+                    <span>
+                        E-mail <code>demo@sam.app</code> · Senha <code>demo1234</code>
+                    </span>
+
+                    <button type="button" class="btn" id="demo-fill">Preencher campos</button>
+
+                    <p class="note2">
+                        Modo local: ainda não há servidor de autenticação.
+                        Contas e dados ficam apenas neste navegador.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <div id="toasts" aria-live="polite"></div>
+
+        <script src="js/ui.js"></script>
+        <script src="js/config.js"></script>
+        <script src="js/enums.js"></script>
+        <script src="js/auth.js"></script>
+        <script src="js/data.js"></script>
+        <script src="js/api.js"></script>
+        <script src="js/components.js"></script>
+        <script src="js/components-parts.js"></script>
+        <script src="js/login.js"></script>
+    </body>
+</html>

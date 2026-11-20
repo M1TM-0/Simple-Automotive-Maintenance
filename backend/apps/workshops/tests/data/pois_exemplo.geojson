@@ -1,0 +1,14 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {"type": "Feature", "id": "g-1",
+     "geometry": {"type": "Point", "coordinates": [-42.8031, -5.0912]},
+     "properties": {"name": "Lava-jato Exemplo", "type": "lava_jato", "address": "Rua Exemplo 1"}},
+    {"type": "Feature",
+     "geometry": {"type": "Point", "coordinates": [-42.81, -5.10]},
+     "properties": {"external_id": "g-2", "name": "Concessionária Exemplo", "type": "concessionaria"}},
+    {"type": "Feature", "id": "g-3",
+     "geometry": {"type": "LineString", "coordinates": [[-42.8, -5.0], [-42.9, -5.1]]},
+     "properties": {"name": "Linha (não é ponto)", "type": "outro"}}
+  ]
+}

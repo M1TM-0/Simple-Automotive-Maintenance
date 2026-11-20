@@ -1,0 +1,40 @@
+# Configuração do Gitleaks (varredura de segredos, P-16).
+#
+# Usa todas as regras padrão do Gitleaks. A única exceção abaixo cobre senhas
+# FICTÍCIAS de fixtures de teste e do ensaio de implantação: são criadas pelos
+# próprios testes num banco descartável e não dão acesso a nada.
+#
+# A exceção é deliberadamente estreita: só vale quando as TRÊS condições ocorrem
+# ao mesmo tempo (condition = "AND"):
+#   1. a regra é `generic-api-key`;
+#   2. o arquivo é um dos listados em `paths`;
+#   3. o valor detectado é exatamente um dos literais de `regexes`.
+# Qualquer outro valor nesses arquivos, ou o mesmo valor em outro arquivo,
+# continua sendo reportado.
+#
+# Requer Gitleaks >= 8.25 (sintaxe `[[allowlists]]`). O CI fixa a versão em
+# `.github/workflows/backend-tests.yml` (GITLEAKS_VERSION) e o pre-commit em
+# `.pre-commit-config.yaml`.
+
+title = "SAM — Gitleaks"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Senhas fictícias de fixtures de teste e do deploy/smoke-test.sh"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = [
+    '''^backend/apps/accounts/tests/test_passwords\.py$''',
+    '''^backend/apps/accounts/tests/test_passwords_integration\.py$''',
+    '''^backend/apps/accounts/tests/test_password_reset\.py$''',
+    '''^backend/apps/accounts/tests/test_admin_accounts\.py$''',
+    '''^backend/tests/e2e/test_flows\.py$''',
+    '''^backend/tests/contract/test_contract\.py$''',
+    '''^deploy/smoke-test\.sh$''',
+]
+regexTarget = "secret"
+regexes = [
+    '''^(?:VentoAzul482|OutraSenha123|OutraSenha456|OutraSenha789|SenhaForte123)$''',
+]

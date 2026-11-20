@@ -1,0 +1,275 @@
+/* Estilos da página shop */
+
+.cover {
+    height: 220px;
+    border-radius: 0 0 22px 22px;
+    background: linear-gradient(120deg, #16110f, #4a2020);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0 8%;
+    overflow: hidden;
+}
+
+.cover svg {
+    width: min(380px, 60%);
+    margin-bottom: -18px;
+    opacity: .9;
+}
+
+.sh {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 6px 26px;
+    margin-top: -52px;
+    padding: 0 24px;
+    max-width: 1100px;
+    margin-inline: auto;
+}
+
+.av {
+    position: relative;
+    width: 128px;
+    height: 128px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #2a2623, #5b3a3a);
+    border: 4px solid var(--cream);
+    display: grid;
+    place-items: center;
+}
+
+.av svg {
+    width: 80px;
+}
+
+.dot {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--online);
+    border: 3px solid var(--cream);
+}
+
+.sh h1 {
+    font-weight: 500;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    line-height: 1.15;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: end;
+    padding-top: 62px;
+}
+
+.info {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    grid-column: 1;
+    margin-top: -6px;
+}
+
+.info dt {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 600;
+    font-size: .8rem;
+}
+
+.info dt svg {
+    color: var(--red);
+}
+
+.info dd {
+    margin: 0 0 0 26px;
+    font-size: .78rem;
+    color: var(--muted);
+}
+
+.tabs {
+    position: relative;
+    display: flex;
+    gap: 26px;
+    margin: 18px 0 14px;
+}
+
+.tabs button {
+    border: 0;
+    background: none;
+    padding: 6px 2px;
+    color: var(--muted);
+}
+
+.tabs button[aria-selected=true] {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.tabs i {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: var(--w, 0);
+    background: var(--red);
+    transform: translateX(var(--x, 0));
+    transition: transform .35s var(--ease), width .35s var(--ease);
+}
+
+.cm {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-top: 10px;
+    animation: in .4s var(--ease) both;
+}
+
+.cm .st {
+    color: var(--amber);
+    letter-spacing: 2px;
+}
+
+.cm blockquote {
+    margin: 8px 0 0;
+    padding-left: 12px;
+    border-left: 3px solid var(--red);
+    font-size: .85rem;
+    color: var(--muted);
+}
+
+.cm button {
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-size: .75rem;
+    text-decoration: underline;
+    float: right;
+}
+
+.note {
+    background: var(--sand);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: .82rem;
+    margin-bottom: 12px;
+}
+
+.gal {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.gal div {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--sand), var(--olive));
+}
+
+.gal div:nth-child(3n) {
+    background: linear-gradient(135deg, #2a2623, #5b3a3a);
+}
+
+.parts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+}
+
+.part {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.part em {
+    font-size: .75rem;
+    color: var(--red-deep);
+    font-style: normal;
+    font-weight: 600;
+}
+
+.part .btn {
+    padding: .4rem 1rem;
+    font-size: .72rem;
+    align-self: start;
+    margin-top: 4px;
+}
+
+@media (max-width: 820px) {
+    .sh {
+        grid-template-columns: 1fr;
+    }
+
+    .info {
+        grid-column: auto;
+    }
+}
+/* v3: perfil com dados reais */
+
+.cover img,
+.av img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hl {
+    display: grid;
+    gap: 2px;
+    font-size: .78rem;
+}
+
+.hl span {
+    display: inline-block;
+    width: 2.4rem;
+    color: var(--muted);
+}
+
+.part__i {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.gal2s {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.gal2s img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+/* v3: quatro ações no topo do perfil quebram linha em telas estreitas */
+
+#acts {
+    flex-wrap: wrap;
+}
+
+.top {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 820px) {
+    .sh {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

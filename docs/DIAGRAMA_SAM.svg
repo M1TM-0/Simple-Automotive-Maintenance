@@ -1,0 +1,608 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2925" height="2336" viewBox="0 0 2925 2336" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12">
+<!-- GERADO por `python manage.py schema_diagram` a partir do banco migrado (database/init.sql + migrations). Não edite à mão. -->
+<defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a94a6"/></marker></defs>
+<rect width="2925" height="2336" fill="#ffffff"/>
+<text x="40" y="46" font-size="22" font-weight="bold" fill="#1f2933">SAM — modelo físico do banco (PostgreSQL)</text>
+<text x="40" y="70" fill="#52606d">PK chave primária · NN obrigatório · → chave estrangeira · ∈ valores permitidos (CHECK/ENUM) · views em tracejado · gerado de database/init.sql + migrations</text>
+<g fill="none" stroke="#8a94a6" stroke-opacity="0.55" stroke-width="1.2">
+<path d="M 2372 193 C 2312 193, 401 149, 341 149" marker-end="url(#seta)"/>
+<path d="M 2372 193 C 2312 193, 2231 1001, 2171 1001" marker-end="url(#seta)"/>
+<path d="M 2372 211 C 2312 211, 2231 1001, 2171 1001" marker-end="url(#seta)"/>
+<path d="M 2372 229 C 2312 229, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 2739 471 C 2779 471, 2779 149, 2739 149" marker-end="url(#seta)"/>
+<path d="M 2739 489 C 2779 489, 2779 149, 2739 149" marker-end="url(#seta)"/>
+<path d="M 2870 731 C 2910 731, 2779 427, 2739 427" marker-end="url(#seta)"/>
+<path d="M 2870 731 C 2910 731, 2910 687, 2870 687" marker-end="url(#seta)"/>
+<path d="M 2870 749 C 2910 749, 2779 427, 2739 427" marker-end="url(#seta)"/>
+<path d="M 2372 749 C 2312 749, 1582 149, 1522 149" marker-end="url(#seta)"/>
+<path d="M 2372 749 C 2312 749, 1677 677, 1617 677" marker-end="url(#seta)"/>
+<path d="M 2372 803 C 2312 803, 1677 677, 1617 677" marker-end="url(#seta)"/>
+<path d="M 2372 821 C 2312 821, 1582 149, 1522 149" marker-end="url(#seta)"/>
+<path d="M 2870 839 C 2910 839, 2910 687, 2870 687" marker-end="url(#seta)"/>
+<path d="M 2870 857 C 2910 857, 2910 687, 2870 687" marker-end="url(#seta)"/>
+<path d="M 623 803 C 563 803, 401 149, 341 149" marker-end="url(#seta)"/>
+<path d="M 623 821 C 563 821, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 538 857 C 578 857, 381 149, 341 149" marker-end="url(#seta)"/>
+<path d="M 538 875 C 578 875, 389 1145, 349 1145" marker-end="url(#seta)"/>
+<path d="M 538 893 C 598 893, 1146 1037, 1206 1037" marker-end="url(#seta)"/>
+<path d="M 538 911 C 598 911, 1146 1351, 1206 1351" marker-end="url(#seta)"/>
+<path d="M 356 417 C 396 417, 381 149, 341 149" marker-end="url(#seta)"/>
+<path d="M 356 435 C 396 435, 491 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 2280 193 C 2320 193, 2306 319, 2266 319" marker-end="url(#seta)"/>
+<path d="M 924 973 C 964 973, 979 759, 939 759" marker-end="url(#seta)"/>
+<path d="M 924 991 C 964 991, 979 759, 939 759" marker-end="url(#seta)"/>
+<path d="M 924 1009 C 964 1009, 979 759, 939 759" marker-end="url(#seta)"/>
+<path d="M 2372 1127 C 2312 1127, 401 149, 341 149" marker-end="url(#seta)"/>
+<path d="M 2372 1145 C 2312 1145, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 623 193 C 563 193, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 623 345 C 563 345, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 1206 193 C 1146 193, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 1719 1081 C 1759 1081, 1562 149, 1522 149" marker-end="url(#seta)"/>
+<path d="M 1206 1081 C 1146 1081, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 1719 1081 C 1759 1081, 1657 677, 1617 677" marker-end="url(#seta)"/>
+<path d="M 1719 1099 C 1759 1099, 1657 677, 1617 677" marker-end="url(#seta)"/>
+<path d="M 1719 1117 C 1759 1117, 1562 149, 1522 149" marker-end="url(#seta)"/>
+<path d="M 1558 1395 C 1598 1395, 1759 1037, 1719 1037" marker-end="url(#seta)"/>
+<path d="M 2266 363 C 2326 363, 2312 149, 2372 149" marker-end="url(#seta)"/>
+<path d="M 2266 363 C 2306 363, 2211 1001, 2171 1001" marker-end="url(#seta)"/>
+<path d="M 2266 381 C 2326 381, 2312 149, 2372 149" marker-end="url(#seta)"/>
+<path d="M 2266 381 C 2326 381, 2312 427, 2372 427" marker-end="url(#seta)"/>
+<path d="M 2266 399 C 2326 399, 2312 427, 2372 427" marker-end="url(#seta)"/>
+<path d="M 2266 399 C 2326 399, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 2266 417 C 2326 417, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 1789 435 C 1729 435, 1640 409, 1580 409" marker-end="url(#seta)"/>
+<path d="M 2266 525 C 2326 525, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 2266 543 C 2326 543, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 2266 659 C 2326 659, 2312 149, 2372 149" marker-end="url(#seta)"/>
+<path d="M 2266 659 C 2306 659, 2211 1001, 2171 1001" marker-end="url(#seta)"/>
+<path d="M 2266 677 C 2326 677, 2312 149, 2372 149" marker-end="url(#seta)"/>
+<path d="M 2266 677 C 2326 677, 2312 427, 2372 427" marker-end="url(#seta)"/>
+<path d="M 2266 695 C 2326 695, 2312 427, 2372 427" marker-end="url(#seta)"/>
+<path d="M 2266 695 C 2326 695, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 2266 713 C 2326 713, 2312 427, 2372 427" marker-end="url(#seta)"/>
+<path d="M 1789 713 C 1729 713, 1582 149, 1522 149" marker-end="url(#seta)"/>
+<path d="M 2266 731 C 2326 731, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 2266 749 C 2326 749, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 1789 767 C 1729 767, 1582 149, 1522 149" marker-end="url(#seta)"/>
+<path d="M 2266 929 C 2326 929, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 2266 947 C 2326 947, 2312 687, 2372 687" marker-end="url(#seta)"/>
+<path d="M 349 1189 C 409 1189, 2312 427, 2372 427" marker-end="url(#seta)"/>
+<path d="M 1580 489 C 1620 489, 1546 561, 1506 561" marker-end="url(#seta)"/>
+<path d="M 1789 1045 C 1729 1045, 401 149, 341 149" marker-end="url(#seta)"/>
+<path d="M 451 713 C 511 713, 563 453, 623 453" marker-end="url(#seta)"/>
+<path d="M 1206 721 C 1146 721, 511 507, 451 507" marker-end="url(#seta)"/>
+<path d="M 1617 739 C 1657 739, 1620 409, 1580 409" marker-end="url(#seta)"/>
+<path d="M 1617 793 C 1657 793, 1546 561, 1506 561" marker-end="url(#seta)"/>
+</g>
+<text x="40" y="124" font-size="14" font-weight="bold" fill="#d9485f">Contas e favoritos (accounts)</text>
+<text x="623" y="124" font-size="14" font-weight="bold" fill="#e07b39">Oficina e mapa (workshops)</text>
+<text x="1206" y="124" font-size="14" font-weight="bold" fill="#c9a227">Catálogo e produtos (catalog)</text>
+<text x="1789" y="124" font-size="14" font-weight="bold" fill="#4f9d69">Veículos e histórico (vehicles)</text>
+<text x="2372" y="124" font-size="14" font-weight="bold" fill="#2f80c0">Atendimento e orçamento (attendances)</text>
+<text x="623" y="734" font-size="14" font-weight="bold" fill="#5b6ad0">Chat (chat)</text>
+<text x="40" y="788" font-size="14" font-weight="bold" fill="#9b59b6">Avaliações e denúncias (reviews)</text>
+<text x="1206" y="1012" font-size="14" font-weight="bold" fill="#c2549b">Promoções e divulgações (promotions)</text>
+<text x="2372" y="1058" font-size="14" font-weight="bold" fill="#2a9d8f">Notificações (notifications)</text>
+<text x="623" y="1156" font-size="14" font-weight="bold" fill="#6c757d">Operação (core)</text>
+<g id="attendance">
+<rect x="2372" y="136" width="367" height="250" rx="6" fill="#ffffff" stroke="#2f80c0" stroke-width="1.5"/>
+<path d="M 2372 142 a 6 6 0 0 1 6 -6 h 355 a 6 6 0 0 1 6 6 v 20 h -367 z" fill="#2f80c0"/>
+<text x="2382" y="153" font-weight="bold" fill="#ffffff">ATTENDANCE</text>
+<text x="2380" y="177" font-weight="bold" fill="#2f80c0">PK</text>
+<text x="2406" y="177" fill="#1f2933">id_attendance: bigint</text>
+<text x="2406" y="195" fill="#1f2933">id_client: bigint (NN)</text>
+<text x="2731" y="195" text-anchor="end" fill="#52606d">→ client, vehicle</text>
+<text x="2406" y="213" fill="#1f2933">id_vehicle: bigint (NN)</text>
+<text x="2731" y="213" text-anchor="end" fill="#52606d">→ vehicle</text>
+<text x="2406" y="231" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="2731" y="231" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="2406" y="249" fill="#1f2933">date_attendance: timestamptz (NN)</text>
+<text x="2406" y="267" fill="#1f2933">status_attendance: status_attendance (NN)</text>
+<text x="2406" y="285" fill="#7b8794" font-style="italic">∈ requested, budgeted, waiting_approval,</text>
+<text x="2406" y="303" fill="#7b8794" font-style="italic">  approved, in_progress, completed,</text>
+<text x="2406" y="321" fill="#7b8794" font-style="italic">  delivered, canceled</text>
+<text x="2406" y="339" fill="#1f2933">mileage_km: integer</text>
+<text x="2406" y="357" fill="#1f2933">observations: text</text>
+<text x="2406" y="375" fill="#1f2933">technical_notes: text</text>
+</g>
+<g id="budget">
+<rect x="2372" y="414" width="367" height="232" rx="6" fill="#ffffff" stroke="#2f80c0" stroke-width="1.5"/>
+<path d="M 2372 420 a 6 6 0 0 1 6 -6 h 355 a 6 6 0 0 1 6 6 v 20 h -367 z" fill="#2f80c0"/>
+<text x="2382" y="431" font-weight="bold" fill="#ffffff">BUDGET</text>
+<text x="2380" y="455" font-weight="bold" fill="#2f80c0">PK</text>
+<text x="2406" y="455" fill="#1f2933">id_budget: bigint</text>
+<text x="2406" y="473" fill="#1f2933">id_attendance: bigint (NN)</text>
+<text x="2731" y="473" text-anchor="end" fill="#52606d">→ attendance</text>
+<text x="2406" y="491" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="2731" y="491" text-anchor="end" fill="#52606d">→ attendance</text>
+<text x="2406" y="509" fill="#1f2933">date_creation: timestamptz (NN)</text>
+<text x="2406" y="527" fill="#1f2933">date_validity: timestamptz (NN)</text>
+<text x="2406" y="545" fill="#1f2933">total_price: numeric(12,2) (NN)</text>
+<text x="2406" y="563" fill="#1f2933">status_budget: varchar(50) (NN)</text>
+<text x="2406" y="581" fill="#7b8794" font-style="italic">∈ pending, approved, rejected, cancelled,</text>
+<text x="2406" y="599" fill="#7b8794" font-style="italic">  expired</text>
+<text x="2406" y="617" fill="#1f2933">date_response: timestamptz</text>
+<text x="2406" y="635" fill="#1f2933">observations: text</text>
+</g>
+<g id="budget_item">
+<rect x="2372" y="674" width="498" height="322" rx="6" fill="#ffffff" stroke="#2f80c0" stroke-width="1.5"/>
+<path d="M 2372 680 a 6 6 0 0 1 6 -6 h 486 a 6 6 0 0 1 6 6 v 20 h -498 z" fill="#2f80c0"/>
+<text x="2382" y="691" font-weight="bold" fill="#ffffff">BUDGET_ITEM</text>
+<text x="2380" y="715" font-weight="bold" fill="#2f80c0">PK</text>
+<text x="2406" y="715" fill="#1f2933">id_budget_item: bigint</text>
+<text x="2406" y="733" fill="#1f2933">id_budget: bigint (NN)</text>
+<text x="2862" y="733" text-anchor="end" fill="#52606d">→ budget, budget_item</text>
+<text x="2406" y="751" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="2862" y="751" text-anchor="end" fill="#52606d">→ budget, product, workshop_service</text>
+<text x="2406" y="769" fill="#1f2933">item_type: varchar(20) (NN)</text>
+<text x="2406" y="787" fill="#7b8794" font-style="italic">∈ service, product, labor, other</text>
+<text x="2406" y="805" fill="#1f2933">id_workshop_service: bigint</text>
+<text x="2862" y="805" text-anchor="end" fill="#52606d">→ workshop_service</text>
+<text x="2406" y="823" fill="#1f2933">id_product: bigint</text>
+<text x="2862" y="823" text-anchor="end" fill="#52606d">→ product</text>
+<text x="2406" y="841" fill="#1f2933">id_service_item: bigint</text>
+<text x="2862" y="841" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="2406" y="859" fill="#1f2933">service_item_type: varchar(20) (gerada)</text>
+<text x="2862" y="859" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="2406" y="877" fill="#1f2933">description: varchar(255) (NN)</text>
+<text x="2406" y="895" fill="#1f2933">quantity: numeric(10,3) (NN)</text>
+<text x="2406" y="913" fill="#1f2933">unit_price: numeric(10,2) (NN)</text>
+<text x="2406" y="931" fill="#1f2933">subtotal: numeric(12,2) (NN, gerada)</text>
+<text x="2406" y="949" fill="#1f2933">execution_status: varchar(20) (NN)</text>
+<text x="2406" y="967" fill="#1f2933">executed_at: timestamptz</text>
+<text x="2406" y="985" fill="#1f2933">created_at: timestamptz (NN)</text>
+</g>
+<g id="chat">
+<rect x="623" y="746" width="316" height="142" rx="6" fill="#ffffff" stroke="#5b6ad0" stroke-width="1.5"/>
+<path d="M 623 752 a 6 6 0 0 1 6 -6 h 304 a 6 6 0 0 1 6 6 v 20 h -316 z" fill="#5b6ad0"/>
+<text x="633" y="763" font-weight="bold" fill="#ffffff">CHAT</text>
+<text x="631" y="787" font-weight="bold" fill="#5b6ad0">PK</text>
+<text x="657" y="787" fill="#1f2933">id_chat: bigint</text>
+<text x="657" y="805" fill="#1f2933">id_client: bigint (NN)</text>
+<text x="931" y="805" text-anchor="end" fill="#52606d">→ client</text>
+<text x="657" y="823" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="931" y="823" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="657" y="841" fill="#1f2933">date_creation: timestamptz (NN)</text>
+<text x="657" y="859" fill="#1f2933">status_chat: varchar(50) (NN)</text>
+<text x="657" y="877" fill="#7b8794" font-style="italic">∈ active, archived, closed</text>
+</g>
+<g id="client">
+<rect x="40" y="136" width="301" height="196" rx="6" fill="#ffffff" stroke="#d9485f" stroke-width="1.5"/>
+<path d="M 40 142 a 6 6 0 0 1 6 -6 h 289 a 6 6 0 0 1 6 6 v 20 h -301 z" fill="#d9485f"/>
+<text x="50" y="153" font-weight="bold" fill="#ffffff">CLIENT</text>
+<text x="48" y="177" font-weight="bold" fill="#d9485f">PK</text>
+<text x="74" y="177" fill="#1f2933">id_client: bigint</text>
+<text x="74" y="195" fill="#1f2933">name: varchar(255) (NN)</text>
+<text x="74" y="213" fill="#1f2933">email: varchar(255) (NN)</text>
+<text x="74" y="231" fill="#1f2933">password_hash: varchar(255) (NN)</text>
+<text x="74" y="249" fill="#1f2933">phone_number: varchar(255)</text>
+<text x="74" y="267" fill="#1f2933">created_at: timestamptz (NN)</text>
+<text x="74" y="285" fill="#1f2933">status: varchar(50) (NN)</text>
+<text x="74" y="303" fill="#7b8794" font-style="italic">∈ active, inactive, blocked</text>
+<text x="74" y="321" fill="#1f2933">photo_profile: varchar(500)</text>
+</g>
+<g id="denunciation">
+<rect x="40" y="800" width="498" height="304" rx="6" fill="#ffffff" stroke="#9b59b6" stroke-width="1.5"/>
+<path d="M 40 806 a 6 6 0 0 1 6 -6 h 486 a 6 6 0 0 1 6 6 v 20 h -498 z" fill="#9b59b6"/>
+<text x="50" y="817" font-weight="bold" fill="#ffffff">DENUNCIATION</text>
+<text x="48" y="841" font-weight="bold" fill="#9b59b6">PK</text>
+<text x="74" y="841" fill="#1f2933">id_denunciation: bigint</text>
+<text x="74" y="859" fill="#1f2933">id_client: bigint (NN)</text>
+<text x="530" y="859" text-anchor="end" fill="#52606d">→ client</text>
+<text x="74" y="877" fill="#1f2933">id_review: uuid</text>
+<text x="530" y="877" text-anchor="end" fill="#52606d">→ review</text>
+<text x="74" y="895" fill="#1f2933">id_promotion: bigint</text>
+<text x="530" y="895" text-anchor="end" fill="#52606d">→ promotion</text>
+<text x="74" y="913" fill="#1f2933">id_promotion_advertisement: bigint</text>
+<text x="530" y="913" text-anchor="end" fill="#52606d">→ promotion_advertisement</text>
+<text x="74" y="931" fill="#1f2933">reason: varchar(50) (NN)</text>
+<text x="74" y="949" fill="#7b8794" font-style="italic">∈ inappropriate_content, offensive_language,</text>
+<text x="74" y="967" fill="#7b8794" font-style="italic">  harassment, spam, false_information, fraud,</text>
+<text x="74" y="985" fill="#7b8794" font-style="italic">  other</text>
+<text x="74" y="1003" fill="#1f2933">description: text</text>
+<text x="74" y="1021" fill="#1f2933">date_creation: timestamptz (NN)</text>
+<text x="74" y="1039" fill="#1f2933">status_denunciation: varchar(30) (NN)</text>
+<text x="74" y="1057" fill="#7b8794" font-style="italic">∈ pending, in_review, upheld, dismissed</text>
+<text x="74" y="1075" fill="#1f2933">moderation_decision: text</text>
+<text x="74" y="1093" fill="#1f2933">date_resolution: timestamptz</text>
+</g>
+<g id="favorite">
+<rect x="40" y="360" width="316" height="106" rx="6" fill="#ffffff" stroke="#d9485f" stroke-width="1.5"/>
+<path d="M 40 366 a 6 6 0 0 1 6 -6 h 304 a 6 6 0 0 1 6 6 v 20 h -316 z" fill="#d9485f"/>
+<text x="50" y="377" font-weight="bold" fill="#ffffff">FAVORITE</text>
+<text x="48" y="401" font-weight="bold" fill="#d9485f">PK</text>
+<text x="74" y="401" fill="#1f2933">id_favorite: bigint</text>
+<text x="74" y="419" fill="#1f2933">id_client: bigint (NN)</text>
+<text x="348" y="419" text-anchor="end" fill="#52606d">→ client</text>
+<text x="74" y="437" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="348" y="437" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="74" y="455" fill="#1f2933">date_creation: timestamptz (NN)</text>
+</g>
+<g id="job_heartbeat">
+<rect x="623" y="1168" width="300" height="142" rx="6" fill="#ffffff" stroke="#6c757d" stroke-width="1.5"/>
+<path d="M 623 1174 a 6 6 0 0 1 6 -6 h 288 a 6 6 0 0 1 6 6 v 20 h -300 z" fill="#6c757d"/>
+<text x="633" y="1185" font-weight="bold" fill="#ffffff">JOB_HEARTBEAT</text>
+<text x="631" y="1209" font-weight="bold" fill="#6c757d">PK</text>
+<text x="657" y="1209" fill="#1f2933">job_name: varchar(50)</text>
+<text x="657" y="1227" fill="#1f2933">date_last_run: timestamptz (NN)</text>
+<text x="657" y="1245" fill="#1f2933">date_last_success: timestamptz</text>
+<text x="657" y="1263" fill="#1f2933">date_last_failure: timestamptz</text>
+<text x="657" y="1281" fill="#1f2933">last_error: text</text>
+<text x="657" y="1299" fill="#1f2933">details: jsonb (NN)</text>
+</g>
+<g id="maintenance_reminder">
+<rect x="1789" y="136" width="491" height="142" rx="6" fill="#ffffff" stroke="#4f9d69" stroke-width="1.5"/>
+<path d="M 1789 142 a 6 6 0 0 1 6 -6 h 479 a 6 6 0 0 1 6 6 v 20 h -491 z" fill="#4f9d69"/>
+<text x="1799" y="153" font-weight="bold" fill="#ffffff">MAINTENANCE_REMINDER</text>
+<text x="1797" y="177" font-weight="bold" fill="#4f9d69">PK</text>
+<text x="1823" y="177" fill="#1f2933">id_maintenance_reminder: bigint</text>
+<text x="1823" y="195" fill="#1f2933">id_register_maintenance: bigint (NN)</text>
+<text x="2272" y="195" text-anchor="end" fill="#52606d">→ register_maintenance</text>
+<text x="1823" y="213" fill="#1f2933">due_mileage_km: integer (NN)</text>
+<text x="1823" y="231" fill="#1f2933">status_reminder: varchar(20) (NN)</text>
+<text x="1823" y="249" fill="#7b8794" font-style="italic">∈ soon, overdue</text>
+<text x="1823" y="267" fill="#1f2933">date_sent: timestamptz (NN)</text>
+</g>
+<g id="message">
+<rect x="623" y="916" width="301" height="178" rx="6" fill="#ffffff" stroke="#5b6ad0" stroke-width="1.5"/>
+<path d="M 623 922 a 6 6 0 0 1 6 -6 h 289 a 6 6 0 0 1 6 6 v 20 h -301 z" fill="#5b6ad0"/>
+<text x="633" y="933" font-weight="bold" fill="#ffffff">MESSAGE</text>
+<text x="631" y="957" font-weight="bold" fill="#5b6ad0">PK</text>
+<text x="657" y="957" fill="#1f2933">id_message: bigint</text>
+<text x="657" y="975" fill="#1f2933">id_chat: bigint (NN)</text>
+<text x="916" y="975" text-anchor="end" fill="#52606d">→ chat</text>
+<text x="657" y="993" fill="#1f2933">id_client: bigint</text>
+<text x="916" y="993" text-anchor="end" fill="#52606d">→ chat</text>
+<text x="657" y="1011" fill="#1f2933">id_workshop: bigint</text>
+<text x="916" y="1011" text-anchor="end" fill="#52606d">→ chat</text>
+<text x="657" y="1029" fill="#1f2933">content: text (NN)</text>
+<text x="657" y="1047" fill="#1f2933">date_sent: timestamptz (NN)</text>
+<text x="657" y="1065" fill="#1f2933">status_message: varchar(50) (NN)</text>
+<text x="657" y="1083" fill="#7b8794" font-style="italic">∈ sent, delivered, read</text>
+</g>
+<g id="notification">
+<rect x="2372" y="1070" width="300" height="178" rx="6" fill="#ffffff" stroke="#2a9d8f" stroke-width="1.5"/>
+<path d="M 2372 1076 a 6 6 0 0 1 6 -6 h 288 a 6 6 0 0 1 6 6 v 20 h -300 z" fill="#2a9d8f"/>
+<text x="2382" y="1087" font-weight="bold" fill="#ffffff">NOTIFICATION</text>
+<text x="2380" y="1111" font-weight="bold" fill="#2a9d8f">PK</text>
+<text x="2406" y="1111" fill="#1f2933">id_notification: bigint</text>
+<text x="2406" y="1129" fill="#1f2933">id_client: bigint</text>
+<text x="2664" y="1129" text-anchor="end" fill="#52606d">→ client</text>
+<text x="2406" y="1147" fill="#1f2933">id_workshop: bigint</text>
+<text x="2664" y="1147" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="2406" y="1165" fill="#1f2933">title: varchar(255) (NN)</text>
+<text x="2406" y="1183" fill="#1f2933">message: text (NN)</text>
+<text x="2406" y="1201" fill="#1f2933">date_creation: timestamptz (NN)</text>
+<text x="2406" y="1219" fill="#1f2933">read_status: boolean (NN)</text>
+<text x="2406" y="1237" fill="#1f2933">url: varchar(255)</text>
+</g>
+<g id="operation_hour">
+<rect x="623" y="136" width="316" height="124" rx="6" fill="#ffffff" stroke="#e07b39" stroke-width="1.5"/>
+<path d="M 623 142 a 6 6 0 0 1 6 -6 h 304 a 6 6 0 0 1 6 6 v 20 h -316 z" fill="#e07b39"/>
+<text x="633" y="153" font-weight="bold" fill="#ffffff">OPERATION_HOUR</text>
+<text x="631" y="177" font-weight="bold" fill="#e07b39">PK</text>
+<text x="657" y="177" fill="#1f2933">id_operation_hour: bigint</text>
+<text x="657" y="195" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="931" y="195" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="657" y="213" fill="#1f2933">day_of_week: integer (NN)</text>
+<text x="657" y="231" fill="#1f2933">opening_time: time (NN)</text>
+<text x="657" y="249" fill="#1f2933">closing_time: time (NN)</text>
+</g>
+<g id="pag_workshop">
+<rect x="623" y="288" width="316" height="124" rx="6" fill="#ffffff" stroke="#e07b39" stroke-width="1.5"/>
+<path d="M 623 294 a 6 6 0 0 1 6 -6 h 304 a 6 6 0 0 1 6 6 v 20 h -316 z" fill="#e07b39"/>
+<text x="633" y="305" font-weight="bold" fill="#ffffff">PAG_WORKSHOP</text>
+<text x="631" y="329" font-weight="bold" fill="#e07b39">PK</text>
+<text x="657" y="329" fill="#1f2933">id_pag_workshop: bigint</text>
+<text x="657" y="347" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="931" y="347" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="657" y="365" fill="#1f2933">description: text</text>
+<text x="657" y="383" fill="#1f2933">photo_profile: varchar(500)</text>
+<text x="657" y="401" fill="#1f2933">photo_banner: varchar(500)</text>
+</g>
+<g id="point_of_interest">
+<rect x="623" y="440" width="374" height="232" rx="6" fill="#ffffff" stroke="#e07b39" stroke-width="1.5"/>
+<path d="M 623 446 a 6 6 0 0 1 6 -6 h 362 a 6 6 0 0 1 6 6 v 20 h -374 z" fill="#e07b39"/>
+<text x="633" y="457" font-weight="bold" fill="#ffffff">POINT_OF_INTEREST</text>
+<text x="631" y="481" font-weight="bold" fill="#e07b39">PK</text>
+<text x="657" y="481" fill="#1f2933">id_point_of_interest: bigint</text>
+<text x="657" y="499" fill="#1f2933">name: varchar(255) (NN)</text>
+<text x="657" y="517" fill="#1f2933">type: type_establishment (NN)</text>
+<text x="657" y="535" fill="#7b8794" font-style="italic">∈ oficina, borracharia, posto_combustivel,</text>
+<text x="657" y="553" fill="#7b8794" font-style="italic">  loja_autopecas, centro_automotivo,</text>
+<text x="657" y="571" fill="#7b8794" font-style="italic">  concessionaria, lava_jato, outro</text>
+<text x="657" y="589" fill="#1f2933">latitude: numeric(9,6) (NN)</text>
+<text x="657" y="607" fill="#1f2933">longitude: numeric(9,6) (NN)</text>
+<text x="657" y="625" fill="#1f2933">address: text</text>
+<text x="657" y="643" fill="#1f2933">external_source: varchar(50)</text>
+<text x="657" y="661" fill="#1f2933">external_id: varchar(255)</text>
+</g>
+<g id="product">
+<rect x="1206" y="136" width="316" height="232" rx="6" fill="#ffffff" stroke="#c9a227" stroke-width="1.5"/>
+<path d="M 1206 142 a 6 6 0 0 1 6 -6 h 304 a 6 6 0 0 1 6 6 v 20 h -316 z" fill="#c9a227"/>
+<text x="1216" y="153" font-weight="bold" fill="#ffffff">PRODUCT</text>
+<text x="1214" y="177" font-weight="bold" fill="#c9a227">PK</text>
+<text x="1240" y="177" fill="#1f2933">id_product: bigint</text>
+<text x="1240" y="195" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="1514" y="195" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="1240" y="213" fill="#1f2933">name: varchar(255) (NN)</text>
+<text x="1240" y="231" fill="#1f2933">description: text</text>
+<text x="1240" y="249" fill="#1f2933">category: varchar(255)</text>
+<text x="1240" y="267" fill="#1f2933">brand: varchar(255)</text>
+<text x="1240" y="285" fill="#1f2933">price: numeric(10,2) (NN)</text>
+<text x="1240" y="303" fill="#1f2933">disponibility: boolean (NN)</text>
+<text x="1240" y="321" fill="#1f2933">photo: varchar(500)</text>
+<text x="1240" y="339" fill="#1f2933">created_at: timestamptz (NN)</text>
+<text x="1240" y="357" fill="#1f2933">active: boolean (NN)</text>
+</g>
+<g id="promotion">
+<rect x="1206" y="1024" width="513" height="286" rx="6" fill="#ffffff" stroke="#c2549b" stroke-width="1.5"/>
+<path d="M 1206 1030 a 6 6 0 0 1 6 -6 h 501 a 6 6 0 0 1 6 6 v 20 h -513 z" fill="#c2549b"/>
+<text x="1216" y="1041" font-weight="bold" fill="#ffffff">PROMOTION</text>
+<text x="1214" y="1065" font-weight="bold" fill="#c2549b">PK</text>
+<text x="1240" y="1065" fill="#1f2933">id_promotion: bigint</text>
+<text x="1240" y="1083" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="1711" y="1083" text-anchor="end" fill="#52606d">→ product, workshop, workshop_service</text>
+<text x="1240" y="1101" fill="#1f2933">id_workshop_service: bigint</text>
+<text x="1711" y="1101" text-anchor="end" fill="#52606d">→ workshop_service</text>
+<text x="1240" y="1119" fill="#1f2933">id_product: bigint</text>
+<text x="1711" y="1119" text-anchor="end" fill="#52606d">→ product</text>
+<text x="1240" y="1137" fill="#1f2933">title: varchar(255) (NN)</text>
+<text x="1240" y="1155" fill="#1f2933">description: text</text>
+<text x="1240" y="1173" fill="#1f2933">type_discount: varchar(50) (NN)</text>
+<text x="1240" y="1191" fill="#7b8794" font-style="italic">∈ percentage, fixed</text>
+<text x="1240" y="1209" fill="#1f2933">discount_value: numeric(10,2) (NN)</text>
+<text x="1240" y="1227" fill="#1f2933">date_start: timestamptz (NN)</text>
+<text x="1240" y="1245" fill="#1f2933">date_end: timestamptz (NN)</text>
+<text x="1240" y="1263" fill="#1f2933">image_url: varchar(500)</text>
+<text x="1240" y="1281" fill="#1f2933">status_promotion: varchar(50) (NN)</text>
+<text x="1240" y="1299" fill="#7b8794" font-style="italic">∈ active, inactive, expired</text>
+</g>
+<g id="promotion_advertisement">
+<rect x="1206" y="1338" width="352" height="232" rx="6" fill="#ffffff" stroke="#c2549b" stroke-width="1.5"/>
+<path d="M 1206 1344 a 6 6 0 0 1 6 -6 h 340 a 6 6 0 0 1 6 6 v 20 h -352 z" fill="#c2549b"/>
+<text x="1216" y="1355" font-weight="bold" fill="#ffffff">PROMOTION_ADVERTISEMENT</text>
+<text x="1214" y="1379" font-weight="bold" fill="#c2549b">PK</text>
+<text x="1240" y="1379" fill="#1f2933">id_promotion_advertisement: bigint</text>
+<text x="1240" y="1397" fill="#1f2933">id_promotion: bigint (NN)</text>
+<text x="1550" y="1397" text-anchor="end" fill="#52606d">→ promotion</text>
+<text x="1240" y="1415" fill="#1f2933">image_url: varchar(500) (NN)</text>
+<text x="1240" y="1433" fill="#1f2933">date_creation: timestamptz (NN)</text>
+<text x="1240" y="1451" fill="#1f2933">date_start: timestamptz (NN)</text>
+<text x="1240" y="1469" fill="#1f2933">date_end: timestamptz (NN)</text>
+<text x="1240" y="1487" fill="#1f2933">advertising_price: numeric(10,2) (NN)</text>
+<text x="1240" y="1505" fill="#1f2933">payment_status: varchar(30) (NN)</text>
+<text x="1240" y="1523" fill="#7b8794" font-style="italic">∈ pending, paid, failed, refunded</text>
+<text x="1240" y="1541" fill="#1f2933">status_advertisement: varchar(30) (NN)</text>
+<text x="1240" y="1559" fill="#7b8794" font-style="italic">∈ pending, active, completed, cancelled</text>
+</g>
+<g id="register_maintenance">
+<rect x="1789" y="306" width="477" height="268" rx="6" fill="#ffffff" stroke="#4f9d69" stroke-width="1.5"/>
+<path d="M 1789 312 a 6 6 0 0 1 6 -6 h 465 a 6 6 0 0 1 6 6 v 20 h -477 z" fill="#4f9d69"/>
+<text x="1799" y="323" font-weight="bold" fill="#ffffff">REGISTER_MAINTENANCE</text>
+<text x="1797" y="347" font-weight="bold" fill="#4f9d69">PK</text>
+<text x="1823" y="347" fill="#1f2933">id_register_maintenance: bigint</text>
+<text x="1823" y="365" fill="#1f2933">id_vehicle: bigint (NN)</text>
+<text x="2258" y="365" text-anchor="end" fill="#52606d">→ attendance, vehicle</text>
+<text x="1823" y="383" fill="#1f2933">id_attendance: bigint</text>
+<text x="2258" y="383" text-anchor="end" fill="#52606d">→ attendance, budget</text>
+<text x="1823" y="401" fill="#1f2933">id_budget: bigint</text>
+<text x="2258" y="401" text-anchor="end" fill="#52606d">→ budget, budget_item</text>
+<text x="1823" y="419" fill="#1f2933">id_budget_item: bigint</text>
+<text x="2258" y="419" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="1823" y="437" fill="#1f2933">id_service: bigint</text>
+<text x="2258" y="437" text-anchor="end" fill="#52606d">→ service</text>
+<text x="1823" y="455" fill="#1f2933">service_name: varchar(255) (NN)</text>
+<text x="1823" y="473" fill="#1f2933">date_maintenance: timestamptz (NN)</text>
+<text x="1823" y="491" fill="#1f2933">mileage_km: integer</text>
+<text x="1823" y="509" fill="#1f2933">observations: text</text>
+<text x="1823" y="527" fill="#1f2933">item_type: varchar(20) (gerada)</text>
+<text x="2258" y="527" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="1823" y="545" fill="#1f2933">item_execution_status: varchar(20) (gerada)</text>
+<text x="2258" y="545" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="1823" y="563" fill="#1f2933">interval_km: integer</text>
+</g>
+<g id="register_maintenance_part">
+<rect x="1789" y="602" width="477" height="358" rx="6" fill="#ffffff" stroke="#4f9d69" stroke-width="1.5"/>
+<path d="M 1789 608 a 6 6 0 0 1 6 -6 h 465 a 6 6 0 0 1 6 6 v 20 h -477 z" fill="#4f9d69"/>
+<text x="1799" y="619" font-weight="bold" fill="#ffffff">REGISTER_MAINTENANCE_PART</text>
+<text x="1797" y="643" font-weight="bold" fill="#4f9d69">PK</text>
+<text x="1823" y="643" fill="#1f2933">id_register_maintenance_part: bigint</text>
+<text x="1823" y="661" fill="#1f2933">id_vehicle: bigint (NN)</text>
+<text x="2258" y="661" text-anchor="end" fill="#52606d">→ attendance, vehicle</text>
+<text x="1823" y="679" fill="#1f2933">id_attendance: bigint (NN)</text>
+<text x="2258" y="679" text-anchor="end" fill="#52606d">→ attendance, budget</text>
+<text x="1823" y="697" fill="#1f2933">id_budget: bigint (NN)</text>
+<text x="2258" y="697" text-anchor="end" fill="#52606d">→ budget, budget_item</text>
+<text x="1823" y="715" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="2258" y="715" text-anchor="end" fill="#52606d">→ budget, product</text>
+<text x="1823" y="733" fill="#1f2933">id_budget_item: bigint (NN)</text>
+<text x="2258" y="733" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="1823" y="751" fill="#1f2933">id_service_item: bigint</text>
+<text x="2258" y="751" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="1823" y="769" fill="#1f2933">id_product: bigint (NN)</text>
+<text x="2258" y="769" text-anchor="end" fill="#52606d">→ product</text>
+<text x="1823" y="787" fill="#1f2933">description: varchar(255) (NN)</text>
+<text x="1823" y="805" fill="#1f2933">brand: varchar(255)</text>
+<text x="1823" y="823" fill="#1f2933">category: varchar(255)</text>
+<text x="1823" y="841" fill="#1f2933">quantity: numeric(10,3) (NN)</text>
+<text x="1823" y="859" fill="#1f2933">unit_price: numeric(10,2) (NN)</text>
+<text x="1823" y="877" fill="#1f2933">date_maintenance: timestamptz (NN)</text>
+<text x="1823" y="895" fill="#1f2933">mileage_km: integer</text>
+<text x="1823" y="913" fill="#1f2933">observations: text</text>
+<text x="1823" y="931" fill="#1f2933">item_type: varchar(20) (gerada)</text>
+<text x="2258" y="931" text-anchor="end" fill="#52606d">→ budget_item</text>
+<text x="1823" y="949" fill="#1f2933">item_execution_status: varchar(20) (gerada)</text>
+<text x="2258" y="949" text-anchor="end" fill="#52606d">→ budget_item</text>
+</g>
+<g id="review">
+<rect x="40" y="1132" width="309" height="196" rx="6" fill="#ffffff" stroke="#9b59b6" stroke-width="1.5"/>
+<path d="M 40 1138 a 6 6 0 0 1 6 -6 h 297 a 6 6 0 0 1 6 6 v 20 h -309 z" fill="#9b59b6"/>
+<text x="50" y="1149" font-weight="bold" fill="#ffffff">REVIEW</text>
+<text x="48" y="1173" font-weight="bold" fill="#9b59b6">PK</text>
+<text x="74" y="1173" fill="#1f2933">id_review: uuid</text>
+<text x="74" y="1191" fill="#1f2933">id_budget: bigint (NN)</text>
+<text x="341" y="1191" text-anchor="end" fill="#52606d">→ budget</text>
+<text x="74" y="1209" fill="#1f2933">rating: integer (NN)</text>
+<text x="74" y="1227" fill="#1f2933">comment: text</text>
+<text x="74" y="1245" fill="#1f2933">date_creation: timestamptz (NN)</text>
+<text x="74" y="1263" fill="#1f2933">workshop_response: text</text>
+<text x="74" y="1281" fill="#1f2933">date_response: timestamptz</text>
+<text x="74" y="1299" fill="#1f2933">status_review: varchar(20) (NN)</text>
+<text x="74" y="1317" fill="#7b8794" font-style="italic">∈ published, hidden, under_review</text>
+</g>
+<g id="service">
+<rect x="1206" y="396" width="374" height="124" rx="6" fill="#ffffff" stroke="#c9a227" stroke-width="1.5"/>
+<path d="M 1206 402 a 6 6 0 0 1 6 -6 h 362 a 6 6 0 0 1 6 6 v 20 h -374 z" fill="#c9a227"/>
+<text x="1216" y="413" font-weight="bold" fill="#ffffff">SERVICE</text>
+<text x="1214" y="437" font-weight="bold" fill="#c9a227">PK</text>
+<text x="1240" y="437" fill="#1f2933">id_service: bigint</text>
+<text x="1240" y="455" fill="#1f2933">name: varchar(255) (NN)</text>
+<text x="1240" y="473" fill="#1f2933">description: text</text>
+<text x="1240" y="491" fill="#1f2933">id_category: bigint (NN)</text>
+<text x="1572" y="491" text-anchor="end" fill="#52606d">→ service_category</text>
+<text x="1240" y="509" fill="#1f2933">active: boolean (NN)</text>
+</g>
+<g id="service_category">
+<rect x="1206" y="548" width="300" height="88" rx="6" fill="#ffffff" stroke="#c9a227" stroke-width="1.5"/>
+<path d="M 1206 554 a 6 6 0 0 1 6 -6 h 288 a 6 6 0 0 1 6 6 v 20 h -300 z" fill="#c9a227"/>
+<text x="1216" y="565" font-weight="bold" fill="#ffffff">SERVICE_CATEGORY</text>
+<text x="1214" y="589" font-weight="bold" fill="#c9a227">PK</text>
+<text x="1240" y="589" fill="#1f2933">id_service_category: bigint</text>
+<text x="1240" y="607" fill="#1f2933">name: varchar(255) (NN)</text>
+<text x="1240" y="625" fill="#1f2933">description: text</text>
+</g>
+<g id="vehicle">
+<rect x="1789" y="988" width="382" height="430" rx="6" fill="#ffffff" stroke="#4f9d69" stroke-width="1.5"/>
+<path d="M 1789 994 a 6 6 0 0 1 6 -6 h 370 a 6 6 0 0 1 6 6 v 20 h -382 z" fill="#4f9d69"/>
+<text x="1799" y="1005" font-weight="bold" fill="#ffffff">VEHICLE</text>
+<text x="1797" y="1029" font-weight="bold" fill="#4f9d69">PK</text>
+<text x="1823" y="1029" fill="#1f2933">id_vehicle: bigint</text>
+<text x="1823" y="1047" fill="#1f2933">id_client: bigint (NN)</text>
+<text x="2163" y="1047" text-anchor="end" fill="#52606d">→ client</text>
+<text x="1823" y="1065" fill="#1f2933">brand: varchar(255) (NN)</text>
+<text x="1823" y="1083" fill="#1f2933">model: varchar(255) (NN)</text>
+<text x="1823" y="1101" fill="#1f2933">year_fabrication: integer (NN)</text>
+<text x="1823" y="1119" fill="#1f2933">year_model: integer (NN)</text>
+<text x="1823" y="1137" fill="#1f2933">plate: varchar(7) (NN)</text>
+<text x="1823" y="1155" fill="#1f2933">fuel: fuel (NN)</text>
+<text x="1823" y="1173" fill="#7b8794" font-style="italic">∈ gasolina, etanol, diesel, flex, eletrico,</text>
+<text x="1823" y="1191" fill="#7b8794" font-style="italic">  hibrido, gnv, outro</text>
+<text x="1823" y="1209" fill="#1f2933">exchange: exchange (NN)</text>
+<text x="1823" y="1227" fill="#7b8794" font-style="italic">∈ manual, automatico, automatizado,</text>
+<text x="1823" y="1245" fill="#7b8794" font-style="italic">  dupla_embreagem, variavel, outro</text>
+<text x="1823" y="1263" fill="#1f2933">version: varchar(255)</text>
+<text x="1823" y="1281" fill="#1f2933">motorization: varchar(255)</text>
+<text x="1823" y="1299" fill="#1f2933">color: varchar(20)</text>
+<text x="1823" y="1317" fill="#1f2933">information: text</text>
+<text x="1823" y="1335" fill="#1f2933">photo_1: varchar(500)</text>
+<text x="1823" y="1353" fill="#1f2933">photo_2: varchar(500)</text>
+<text x="1823" y="1371" fill="#1f2933">photo_3: varchar(500)</text>
+<text x="1823" y="1389" fill="#1f2933">mileage_km: integer</text>
+<text x="1823" y="1407" fill="#1f2933">history_shared: boolean (NN)</text>
+</g>
+<g id="vw_advertisement_effective">
+<rect x="1206" y="1598" width="316" height="214" rx="6" fill="#ffffff" stroke="#c2549b" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 1206 1604 a 6 6 0 0 1 6 -6 h 304 a 6 6 0 0 1 6 6 v 20 h -316 z" fill="#c2549b"/>
+<text x="1216" y="1615" font-weight="bold" fill="#ffffff">VW_ADVERTISEMENT_EFFECTIVE  (view)</text>
+<text x="1240" y="1639" fill="#1f2933">id_promotion_advertisement: bigint</text>
+<text x="1240" y="1657" fill="#1f2933">id_promotion: bigint</text>
+<text x="1240" y="1675" fill="#1f2933">image_url: varchar(500)</text>
+<text x="1240" y="1693" fill="#1f2933">date_creation: timestamptz</text>
+<text x="1240" y="1711" fill="#1f2933">date_start: timestamptz</text>
+<text x="1240" y="1729" fill="#1f2933">date_end: timestamptz</text>
+<text x="1240" y="1747" fill="#1f2933">advertising_price: numeric(10,2)</text>
+<text x="1240" y="1765" fill="#1f2933">payment_status: varchar(30)</text>
+<text x="1240" y="1783" fill="#1f2933">status_advertisement: varchar(30)</text>
+<text x="1240" y="1801" fill="#1f2933">is_running_now: boolean</text>
+</g>
+<g id="vw_promotion_effective">
+<rect x="1206" y="1840" width="300" height="286" rx="6" fill="#ffffff" stroke="#c2549b" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 1206 1846 a 6 6 0 0 1 6 -6 h 288 a 6 6 0 0 1 6 6 v 20 h -300 z" fill="#c2549b"/>
+<text x="1216" y="1857" font-weight="bold" fill="#ffffff">VW_PROMOTION_EFFECTIVE  (view)</text>
+<text x="1240" y="1881" fill="#1f2933">id_promotion: bigint</text>
+<text x="1240" y="1899" fill="#1f2933">id_workshop: bigint</text>
+<text x="1240" y="1917" fill="#1f2933">id_workshop_service: bigint</text>
+<text x="1240" y="1935" fill="#1f2933">id_product: bigint</text>
+<text x="1240" y="1953" fill="#1f2933">title: varchar(255)</text>
+<text x="1240" y="1971" fill="#1f2933">description: text</text>
+<text x="1240" y="1989" fill="#1f2933">type_discount: varchar(50)</text>
+<text x="1240" y="2007" fill="#1f2933">discount_value: numeric(10,2)</text>
+<text x="1240" y="2025" fill="#1f2933">date_start: timestamptz</text>
+<text x="1240" y="2043" fill="#1f2933">date_end: timestamptz</text>
+<text x="1240" y="2061" fill="#1f2933">image_url: varchar(500)</text>
+<text x="1240" y="2079" fill="#1f2933">status_promotion: varchar(50)</text>
+<text x="1240" y="2097" fill="#1f2933">effective_status: text</text>
+<text x="1240" y="2115" fill="#1f2933">is_valid_now: boolean</text>
+</g>
+<g id="vw_vehicle_maintenance_history">
+<rect x="1789" y="1446" width="301" height="376" rx="6" fill="#ffffff" stroke="#4f9d69" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M 1789 1452 a 6 6 0 0 1 6 -6 h 289 a 6 6 0 0 1 6 6 v 20 h -301 z" fill="#4f9d69"/>
+<text x="1799" y="1463" font-weight="bold" fill="#ffffff">VW_VEHICLE_MAINTENANCE_HISTORY  (view)</text>
+<text x="1823" y="1487" fill="#1f2933">id_vehicle: bigint</text>
+<text x="1823" y="1505" fill="#1f2933">record_type: text</text>
+<text x="1823" y="1523" fill="#1f2933">id_record: bigint</text>
+<text x="1823" y="1541" fill="#1f2933">id_attendance: bigint</text>
+<text x="1823" y="1559" fill="#1f2933">id_budget: bigint</text>
+<text x="1823" y="1577" fill="#1f2933">id_budget_item: bigint</text>
+<text x="1823" y="1595" fill="#1f2933">id_workshop: bigint</text>
+<text x="1823" y="1613" fill="#1f2933">id_service: bigint</text>
+<text x="1823" y="1631" fill="#1f2933">id_product: bigint</text>
+<text x="1823" y="1649" fill="#1f2933">id_service_item: bigint</text>
+<text x="1823" y="1667" fill="#1f2933">description: varchar(255)</text>
+<text x="1823" y="1685" fill="#1f2933">brand: varchar</text>
+<text x="1823" y="1703" fill="#1f2933">category: varchar</text>
+<text x="1823" y="1721" fill="#1f2933">quantity: numeric(10,3)</text>
+<text x="1823" y="1739" fill="#1f2933">unit_price: numeric(10,2)</text>
+<text x="1823" y="1757" fill="#1f2933">date_maintenance: timestamptz</text>
+<text x="1823" y="1775" fill="#1f2933">mileage_km: integer</text>
+<text x="1823" y="1793" fill="#1f2933">observations: text</text>
+<text x="1823" y="1811" fill="#1f2933">interval_km: integer</text>
+</g>
+<g id="workshop">
+<rect x="40" y="494" width="411" height="232" rx="6" fill="#ffffff" stroke="#d9485f" stroke-width="1.5"/>
+<path d="M 40 500 a 6 6 0 0 1 6 -6 h 399 a 6 6 0 0 1 6 6 v 20 h -411 z" fill="#d9485f"/>
+<text x="50" y="511" font-weight="bold" fill="#ffffff">WORKSHOP</text>
+<text x="48" y="535" font-weight="bold" fill="#d9485f">PK</text>
+<text x="74" y="535" fill="#1f2933">id_workshop: bigint</text>
+<text x="74" y="553" fill="#1f2933">name_fantasy: varchar(255) (NN)</text>
+<text x="74" y="571" fill="#1f2933">name_responsible: varchar(255) (NN)</text>
+<text x="74" y="589" fill="#1f2933">email: varchar(255) (NN)</text>
+<text x="74" y="607" fill="#1f2933">password_hash: varchar(255) (NN)</text>
+<text x="74" y="625" fill="#1f2933">phone_number: varchar(255)</text>
+<text x="74" y="643" fill="#1f2933">cnpj: varchar(14) (NN)</text>
+<text x="74" y="661" fill="#1f2933">created_at: timestamptz (NN)</text>
+<text x="74" y="679" fill="#1f2933">status: varchar(50) (NN)</text>
+<text x="74" y="697" fill="#7b8794" font-style="italic">∈ active, inactive, blocked</text>
+<text x="74" y="715" fill="#1f2933">id_point_of_interest: bigint</text>
+<text x="443" y="715" text-anchor="end" fill="#52606d">→ point_of_interest</text>
+</g>
+<g id="workshop_service">
+<rect x="1206" y="664" width="411" height="286" rx="6" fill="#ffffff" stroke="#c9a227" stroke-width="1.5"/>
+<path d="M 1206 670 a 6 6 0 0 1 6 -6 h 399 a 6 6 0 0 1 6 6 v 20 h -411 z" fill="#c9a227"/>
+<text x="1216" y="681" font-weight="bold" fill="#ffffff">WORKSHOP_SERVICE</text>
+<text x="1214" y="705" font-weight="bold" fill="#c9a227">PK</text>
+<text x="1240" y="705" fill="#1f2933">id_workshop_service: bigint</text>
+<text x="1240" y="723" fill="#1f2933">id_workshop: bigint (NN)</text>
+<text x="1609" y="723" text-anchor="end" fill="#52606d">→ workshop</text>
+<text x="1240" y="741" fill="#1f2933">id_service: bigint</text>
+<text x="1609" y="741" text-anchor="end" fill="#52606d">→ service</text>
+<text x="1240" y="759" fill="#1f2933">name_local: varchar(255)</text>
+<text x="1240" y="777" fill="#1f2933">description_local: text</text>
+<text x="1240" y="795" fill="#1f2933">id_suggested_category: bigint</text>
+<text x="1609" y="795" text-anchor="end" fill="#52606d">→ service_category</text>
+<text x="1240" y="813" fill="#1f2933">price_base: numeric(10,2) (NN)</text>
+<text x="1240" y="831" fill="#1f2933">duration_estimate: integer (NN)</text>
+<text x="1240" y="849" fill="#1f2933">disponibility: boolean (NN)</text>
+<text x="1240" y="867" fill="#1f2933">status_solicitation: varchar(50)</text>
+<text x="1240" y="885" fill="#7b8794" font-style="italic">∈ pending, approved, rejected</text>
+<text x="1240" y="903" fill="#1f2933">motivation_rejection: text</text>
+<text x="1240" y="921" fill="#1f2933">date_solicitation_response: timestamptz</text>
+<text x="1240" y="939" fill="#1f2933">created_at: timestamptz (NN)</text>
+</g>
+<text x="40" y="2198" font-size="14" font-weight="bold" fill="#1f2933">Tipos ENUM</text>
+<text x="40" y="2220" fill="#1f2933">exchange ∈ manual, automatico, automatizado, dupla_embreagem, variavel, outro</text>
+<text x="40" y="2238" fill="#1f2933">fuel ∈ gasolina, etanol, diesel, flex, eletrico, hibrido, gnv, outro</text>
+<text x="40" y="2256" fill="#1f2933">status_attendance ∈ requested, budgeted, waiting_approval, approved, in_progress, completed, delivered, canceled</text>
+<text x="40" y="2274" fill="#1f2933">type_establishment ∈ oficina, borracharia, posto_combustivel, loja_autopecas, centro_automotivo, concessionaria, lava_jato, outro</text>
+</svg>

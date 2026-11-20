@@ -1,0 +1,8 @@
+external_id,name,type,latitude,longitude,address
+ex-1,Borracharia Exemplo Um,borracharia,-5.091200,-42.803100,Rua Exemplo 10
+ex-2,Posto Exemplo Dois,posto_combustivel,-5.0955,-42.8100,
+ex-3,Autopeças Exemplo Três,loja_autopecas,"-5,1001","-42,7900",Av. Exemplo 300
+ex-4,Ponto com latitude inválida,borracharia,120,-42.8,
+ex-5,Tipo inválido,padaria,-5.09,-42.80,
+,Sem identificador,oficina,-5.09,-42.80,
+ex-7,,lava_jato,-5.09,-42.80,

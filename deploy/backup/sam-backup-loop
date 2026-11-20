@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Agendador do serviço `backup` (BE-090): um backup por dia (DP-22), sem cron.
+#
+# A cada BACKUP_CHECK_SECONDS (300) decide se é hora — como um cron diário que recupera
+# o atraso:
+#   * "horário agendado" = a última ocorrência de BACKUP_HOUR:00 (hora local, padrão 03);
+#   * nunca houve backup bem-sucedido, ou o último é ANTERIOR ao horário agendado → roda
+#     (às 03h todo dia; se o contêiner estava parado às 03h, roda assim que voltar);
+#   * depois de uma falha, espera BACKUP_RETRY_SECONDS (3600) antes de tentar de novo.
+# Intervalo entre backups ≤ 24 h + BACKUP_CHECK_SECONDS → RPO 24 h (BE-094). A regra
+# antiga (">20 h e hora certa", senão ">26 h") derivava para um backup a cada 26 h
+# quando a primeira execução era depois das 07h.
+# Reiniciar o contêiner não dispara backup extra (o estado fica em $BACKUP_DIR/.state).
+# SIGTERM encerra entre execuções; um backup em andamento termina antes (stop_grace_period).
+set -Eeuo pipefail
+
+HERE=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+# shellcheck source=lib.sh
+. "$HERE/lib.sh"
+
+: "${BACKUP_HOUR:=03}"
+: "${BACKUP_CHECK_SECONDS:=300}"
+: "${BACKUP_RETRY_SECONDS:=3600}"
+STATE="$BACKUP_DIR/.state"
+
+last_success=0
+last_attempt=0
+# shellcheck disable=SC1090
+[[ -f "$STATE" ]] && . "$STATE"
+
+save_state() {
+    printf 'last_success=%s\nlast_attempt=%s\n' "$last_success" "$last_attempt" >"$STATE.tmp"
+    mv "$STATE.tmp" "$STATE"
+}
+
+# Última ocorrência de BACKUP_HOUR:00 (hoje, ou ontem se ainda não chegou a hora).
+scheduled_time() {
+    local now=$1 today
+    today=$(date -d "today ${BACKUP_HOUR}:00" +%s)
+    if ((now >= today)); then echo "$today"; else date -d "yesterday ${BACKUP_HOUR}:00" +%s; fi
+}
+
+due() {
+    local now
+    now=$(date +%s)
+    ((now - last_attempt >= BACKUP_RETRY_SECONDS)) || return 1
+    ((last_success < $(scheduled_time "$now")))
+}
+
+running=1
+trap 'running=0' TERM INT
+log INFO "Agendador de backup iniciado (hora local $BACKUP_HOUR, TZ=${TZ:-UTC})"
+
+while ((running)); do
+    if due; then
+        last_attempt=$(date +%s)
+        if "$HERE/sam-backup" >/dev/null; then
+            last_success=$(date +%s)
+        fi
+        save_state
+    fi
+    # `sleep` em segundo plano + wait: o SIGTERM interrompe a espera na hora.
+    sleep "$BACKUP_CHECK_SECONDS" &
+    wait $! || true
+done
+log INFO "Agendador de backup encerrado."

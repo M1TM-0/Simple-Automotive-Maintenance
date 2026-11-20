@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+# Restauração de um backup do SAM em ambiente LIMPO, com conferência (BE-090).
+#
+#   sam-restore ARQUIVO|latest [--media-dir DIR] [--keep-work]
+#
+# Banco de destino: variáveis da libpq (PGHOST, PGDATABASE…). Ele precisa estar VAZIO
+# (sem tabelas): crie um banco novo — a restauração nunca apaga dados existentes.
+# Mídia de destino: --media-dir (padrão $MEDIA_DIR), também vazio.
+#
+# Decifrar: BACKUP_PASSPHRASE_FILE (frase secreta) ou BACKUP_GPG_PRIVATE_KEY_FILE (chave
+# privada; se ela tiver senha, BACKUP_GPG_PRIVATE_KEY_PASSPHRASE_FILE).
+#
+# Conferências (qualquer divergência → saída 1):
+#   1. sha256 do arquivo (.sha256 ao lado), do dump e da lista de imagens;
+#   2. pg_restore numa transação única, parando no primeiro erro;
+#   3. linhas por tabela = manifest.json (mesmo snapshot do dump) e md5 do conteúdo de
+#      cada tabela = manifest.json (backups gerados a partir do BE-094);
+#   4. cada imagem com o hash registrado (sha256sum -c).
+# Depois: suba a API apontando para o banco restaurado e confira /api/health/ready/
+# (passo a passo e registro do ensaio: backend/docs/RUNBOOK.md, seção Backup).
+set -Eeuo pipefail
+
+HERE=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+# shellcheck source=lib.sh
+. "$HERE/lib.sh"
+SAM_LOGGER=sam.restore
+
+usage() {
+    echo "uso: sam-restore ARQUIVO|latest [--media-dir DIR] [--keep-work]" >&2
+    exit 2
+}
+
+[[ $# -ge 1 ]] || usage
+ARCHIVE=$1
+shift
+TARGET_MEDIA=$MEDIA_DIR
+KEEP_WORK=0
+while [[ $# -gt 0 ]]; do
+    case $1 in
+    --media-dir) TARGET_MEDIA=${2:?}; shift 2 ;;
+    --keep-work) KEEP_WORK=1; shift ;;
+    *) usage ;;
+    esac
+done
+
+require_commands psql pg_restore tar gpg jq sha256sum
+
+if [[ "$ARCHIVE" == "latest" ]]; then
+    ARCHIVE=$(find "$BACKUP_DIR" -maxdepth 1 -type f \( -name 'sam-*.tar.gpg' -o -name 'sam-*.tar' \) | sort | tail -n 1)
+    [[ -n "$ARCHIVE" ]] || die "Nenhum backup em $BACKUP_DIR."
+fi
+[[ -f "$ARCHIVE" ]] || die "Arquivo não encontrado: $ARCHIVE"
+
+WORK=$(mktemp -d)
+cleanup() {
+    [[ -n "${GNUPGHOME:-}" && "$GNUPGHOME" == /tmp/* ]] && rm -rf "$GNUPGHOME"
+    if [[ "$KEEP_WORK" == 1 ]]; then log INFO "Arquivos extraídos mantidos em $WORK"; else rm -rf "$WORK"; fi
+}
+trap cleanup EXIT
+
+log INFO "Restaurando $ARCHIVE em ${PGDATABASE:-?}@${PGHOST:-local}"
+check_server_version
+
+# ------------------------------------------------------------ 1. integridade do arquivo
+if [[ -f "$ARCHIVE.sha256" ]]; then
+    (cd "$(dirname "$ARCHIVE")" && sha256sum -c --quiet "$(basename "$ARCHIVE").sha256") ||
+        die "O arquivo não confere com $ARCHIVE.sha256 (corrompido ou alterado)."
+else
+    log WARNING "Sem $ARCHIVE.sha256: conferência do arquivo inteiro pulada."
+fi
+
+# ------------------------------------------------------------ destino vazio
+TABLES_NOW=$(psql -X -At -c "SELECT count(*) FROM pg_class WHERE relnamespace = 'public'::regnamespace AND relkind IN ('r', 'p', 'v')")
+[[ "$TABLES_NOW" == 0 ]] || die "O banco ${PGDATABASE:-} não está vazio ($TABLES_NOW tabelas/views). Restaure num banco novo."
+mkdir -p "$TARGET_MEDIA"
+[[ -z "$(find "$TARGET_MEDIA" -mindepth 1 -print -quit)" ]] || die "O diretório de mídia $TARGET_MEDIA não está vazio."
+
+# ------------------------------------------------------------ decifrar e extrair
+case "$ARCHIVE" in
+*.gpg)
+    gpg_home
+    if [[ -n "${BACKUP_GPG_PRIVATE_KEY_FILE:-}" ]]; then
+        gpg --batch --quiet --import "$BACKUP_GPG_PRIVATE_KEY_FILE"
+        DECRYPT=(gpg --batch --quiet --decrypt)
+        if [[ -n "${BACKUP_GPG_PRIVATE_KEY_PASSPHRASE_FILE:-}" ]]; then
+            DECRYPT+=(--pinentry-mode loopback --passphrase-file "$BACKUP_GPG_PRIVATE_KEY_PASSPHRASE_FILE")
+        fi
+    elif [[ -n "${BACKUP_PASSPHRASE_FILE:-}" ]]; then
+        DECRYPT=(gpg --batch --quiet --decrypt --pinentry-mode loopback --passphrase-file "$BACKUP_PASSPHRASE_FILE")
+    else
+        die "Defina BACKUP_PASSPHRASE_FILE ou BACKUP_GPG_PRIVATE_KEY_FILE para decifrar."
+    fi
+    "${DECRYPT[@]}" "$ARCHIVE" | tar -C "$WORK" -xf - || die "Não foi possível decifrar/extrair (chave ou frase erradas?)."
+    ;;
+*.tar)
+    tar -C "$WORK" -xf "$ARCHIVE"
+    ;;
+*) die "Formato desconhecido: $ARCHIVE" ;;
+esac
+
+MANIFEST="$WORK/manifest.json"
+[[ -f "$MANIFEST" && -f "$WORK/db.dump" && -f "$WORK/media.tar" ]] || die "Pacote incompleto."
+[[ "$(jq -r .format "$MANIFEST")" == 1 ]] || die "Versão de manifesto não suportada."
+[[ "$(sha256_of "$WORK/db.dump")" == "$(jq -r .db_dump_sha256 "$MANIFEST")" ]] || die "db.dump não confere com o manifesto."
+[[ "$(sha256_of "$WORK/media.sha256")" == "$(jq -r .media.list_sha256 "$MANIFEST")" ]] || die "media.sha256 não confere com o manifesto."
+
+# ------------------------------------------------------------ 2. banco
+# Sem dono/privilégios do servidor de origem: os objetos ficam com o usuário que restaura.
+pg_restore --exit-on-error --single-transaction --no-owner --no-privileges \
+    --dbname="${PGDATABASE:?defina PGDATABASE}" "$WORK/db.dump" ||
+    die "pg_restore falhou: nada foi gravado (transação única)."
+
+# ------------------------------------------------------------ 3. contagens
+ACTUAL=$(psql -X -At -c "SELECT COALESCE(json_object_agg(c.relname, (xpath('/row/n/text()', query_to_xml(format('SELECT count(*) AS n FROM public.%I', c.relname), false, true, '')))[1]::text::bigint ORDER BY c.relname), '{}') FROM pg_class c WHERE c.relnamespace = 'public'::regnamespace AND c.relkind IN ('r', 'p')")
+DIFF=$(jq -cn --argjson expected "$(jq -c .tables "$MANIFEST")" --argjson actual "$ACTUAL" \
+    '[($expected + $actual) | keys[] as $t | select($expected[$t] != $actual[$t]) | {table: $t, expected: $expected[$t], actual: $actual[$t]}]')
+[[ "$DIFF" == "[]" ]] || die "Contagens divergentes: $DIFF"
+
+# ------------------------------------------------------------ 3b. conteúdo (md5 por tabela)
+# Manifestos antigos (sem `checksums`) só têm as contagens.
+if [[ "$(jq -r 'has("checksums")' "$MANIFEST")" == true ]]; then
+    ACTUAL_SUMS=$(psql -X -q -At -c "$CHECKSUM_SETTINGS" -c "$CHECKSUM_QUERY")
+    DIFF=$(jq -cn --argjson expected "$(jq -c .checksums "$MANIFEST")" --argjson actual "$ACTUAL_SUMS" \
+        '[($expected + $actual) | keys[] as $t | select($expected[$t] != $actual[$t]) | $t]')
+    [[ "$DIFF" == "[]" ]] || die "Conteúdo divergente (md5) nas tabelas: $DIFF"
+    CONTENT_CHECKED=$(jq -r '.checksums | length' "$MANIFEST")
+else
+    log WARNING "Manifesto sem checksums de conteúdo: conferidas só as contagens."
+    CONTENT_CHECKED=0
+fi
+
+# ------------------------------------------------------------ 4. mídia
+tar -C "$TARGET_MEDIA" -xf "$WORK/media.tar"
+EXPECTED_MEDIA=$(jq -er '.media.files' "$MANIFEST") || die "Quantidade de imagens inválida no manifesto."
+if [[ -s "$WORK/media.sha256" ]]; then
+    (cd "$TARGET_MEDIA" && sha256sum -c --quiet --strict "$WORK/media.sha256") ||
+        die "Imagens divergentes do backup."
+else
+    [[ "$EXPECTED_MEDIA" == "0" ]] ||
+        die "Lista de hashes vazia, mas o manifesto declara $EXPECTED_MEDIA imagens."
+fi
+MEDIA_FILES=$(find "$TARGET_MEDIA" -type f | wc -l)
+[[ "$MEDIA_FILES" == "$EXPECTED_MEDIA" ]] || die "Número de imagens divergente: $MEDIA_FILES."
+if [[ "$(id -u)" == 0 && -n "${MEDIA_OWNER:-}" ]]; then
+    chown -R "$MEDIA_OWNER" "$TARGET_MEDIA"  # no compose: 10001:10001 (usuário da API)
+fi
+
+REPORT=$(jq -c --argjson media "$MEDIA_FILES" --argjson content "$CONTENT_CHECKED" \
+    '{restored_from: .created_at, server_version, tables: (.tables | length),
+      rows: ([.tables[]] | add), content_checked_tables: $content, media_files: $media, migrations}' "$MANIFEST")
+log INFO "Restauração conferida: $REPORT"
+echo "$REPORT"

@@ -1,0 +1,87 @@
+from apps.attendances import views
+from django.urls import path
+
+urlpatterns = [
+    # Cliente
+    path(
+        "attendances/",
+        views.ClientAttendanceListCreateView.as_view(),
+        name="attendances",
+    ),
+    path(
+        "attendances/<int:pk>/",
+        views.ClientAttendanceDetailView.as_view(),
+        name="attendance-detail",
+    ),
+    path(
+        "attendances/<int:pk>/cancel/",
+        views.ClientAttendanceCancelView.as_view(),
+        name="attendance-cancel",
+    ),
+    path(
+        "budgets/<int:pk>/approve/",
+        views.ClientBudgetApproveView.as_view(),
+        name="budget-approve",
+    ),
+    path(
+        "budgets/<int:pk>/reject/",
+        views.ClientBudgetRejectView.as_view(),
+        name="budget-reject",
+    ),
+    # Oficina
+    path(
+        "workshop/attendances/",
+        views.WorkshopAttendanceListView.as_view(),
+        name="workshop-attendances",
+    ),
+    path(
+        "workshop/attendances/<int:pk>/",
+        views.WorkshopAttendanceDetailView.as_view(),
+        name="workshop-attendance-detail",
+    ),
+    path(
+        "workshop/attendances/<int:pk>/transition/",
+        views.WorkshopAttendanceTransitionView.as_view(),
+        name="workshop-attendance-transition",
+    ),
+    path(
+        "workshop/attendances/<int:pk>/budget/",
+        views.WorkshopBudgetCreateView.as_view(),
+        name="workshop-attendance-budget",
+    ),
+    path(
+        "workshop/budgets/<int:id_budget>/",
+        views.WorkshopBudgetDetailView.as_view(),
+        name="workshop-budget-detail",
+    ),
+    path(
+        "workshop/budgets/<int:id_budget>/items/",
+        views.WorkshopBudgetItemCreateView.as_view(),
+        name="workshop-budget-items",
+    ),
+    path(
+        "workshop/budgets/<int:id_budget>/items/<int:id_budget_item>/",
+        views.WorkshopBudgetItemDetailView.as_view(),
+        name="workshop-budget-item-detail",
+    ),
+    path(
+        "workshop/budgets/<int:id_budget>/items/<int:id_budget_item>/execution/",
+        views.WorkshopBudgetItemExecutionView.as_view(),
+        name="workshop-budget-item-execution",
+    ),
+    path(
+        "workshop/budgets/<int:id_budget>/send/",
+        views.WorkshopBudgetSendView.as_view(),
+        name="workshop-budget-send",
+    ),
+    path(
+        "workshop/clients/",
+        views.WorkshopClientListView.as_view(),
+        name="workshop-clients",
+    ),
+    path(
+        "workshop/clients/<int:id_client>/vehicles/",
+        views.WorkshopClientVehiclesView.as_view(),
+        name="workshop-client-vehicles",
+    ),
+]
